@@ -64,6 +64,17 @@ contract ClosedEndFund {
         return _amountOfTokens;
     }
 
+    // manager can withdraw to invest (other idea, pay directly through contract)
+    function withdraw() public {
+        require(
+            msg.sender == manager,
+            "Withdraw only allowed for fund manager"
+        );
+        uint256 contractBalance = address(this).balance;
+        require(contractBalance > 0, "Contract has no balance to withdraw");
+        payable(msg.sender).transfer(contractBalance);
+    }
+
     // return contract balance
     function balance() public view returns (uint256) {
         return address(this).balance;
