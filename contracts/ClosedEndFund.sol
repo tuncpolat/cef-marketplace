@@ -63,4 +63,9 @@ contract ClosedEndFund {
 
         return _amountOfTokens;
     }
+
+    // return contract balance
+    function balance() public view returns (uint256) {
+        return address(this).balance;
+    }
 }
