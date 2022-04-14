@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity ^0.8.12;
 
 /**
  * @title Closed-End Fund
  * @dev Tunç Polat
  **/
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol"; //"@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "hardhat/console.sol"; // debug
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract CEFToken is ERC20 {
     constructor(uint256 initialSupply) payable ERC20("CEF TOKEN", "CEF") {
@@ -17,20 +16,27 @@ contract CEFToken is ERC20 {
 }
 
 contract ClosedEndFund is CEFToken {
+    // *** VARIABLES *** //
+
     address public manager; // address of the fund manager
     string public title; // name of the fund
     string public description; // description of the fund
     uint256 public tokenPrice; // in WEI
     uint256 public tokensPerInvestor; // tokens that investor can buy at once
-    mapping(address => bool) whiteListedInvestors; // white-listed investors
+    mapping(address => bool) public whiteListedInvestors; // white-listed investors
+
+    // *** EVENTS *** //
 
     event BuyInitialTokens(
         address buyer,
         uint256 amountOfETH,
         uint256 amountOfTokens
     );
+    event CapitalCall(uint256 amountOfTokens);
+    event SetNewTokenPrice(uint256 newTokenPrice);
+    event SetNewTokenCap(uint256 newTokenCap);
 
-    // *** MODIFIERS ***
+    // *** MODIFIERS *** //
 
     modifier onlyManager() {
         require(
@@ -68,6 +74,8 @@ contract ClosedEndFund is CEFToken {
             whiteListedInvestors[whiteListedInvestor] = true;
         }
     }
+
+    // *** STO & Transfer *** //
 
     function buyInitialTokens(uint256 _amountOfTokens)
         public
@@ -121,6 +129,32 @@ contract ClosedEndFund is CEFToken {
     {
         bool investorIsWhitelisted = whiteListedInvestors[_whitelistedAddress];
         return investorIsWhitelisted;
+    }
+
+    // *** Corporate Actions *** //
+
+    // capital call
+    function mintNewTokens(uint256 _amountOfTokens) public returns (uint256) {
+        _mint(manager, _amountOfTokens); // mint new tokens
+        emit CapitalCall(_amountOfTokens); // emit the event
+        return _amountOfTokens;
+    }
+
+    // set new token price
+    function setTokenPrice(uint256 _newTokenPrice) public returns (uint256) {
+        tokenPrice = _newTokenPrice; // set new token price
+        emit SetNewTokenPrice(tokenPrice); // emit the event
+        return tokenPrice;
+    }
+
+    // set new token per investor
+    function setTokenPerInvestor(uint256 _newTokenCap)
+        public
+        returns (uint256)
+    {
+        tokensPerInvestor = _newTokenCap; // set new token price
+        emit SetNewTokenCap(tokenPrice); // emit the event
+        return tokensPerInvestor;
     }
 }
 
