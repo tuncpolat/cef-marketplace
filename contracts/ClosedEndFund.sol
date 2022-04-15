@@ -23,7 +23,21 @@ contract ClosedEndFund is CEFToken {
     string public description; // description of the fund
     uint256 public tokenPrice; // in WEI
     uint256 public tokensPerInvestor; // tokens that investor can buy at once
+    bool public isDutchAuction; // decide whether it's a dutch auction or waiting list mechanism
     mapping(address => bool) public whiteListedInvestors; // white-listed investors
+
+    // *** STRUCT *** //
+    struct Auction {
+        address seller; // addres of seller
+        uint256 amountToSell; // amount of tokens to sell
+        uint256 startingPrice; // startin price of auction
+        uint256 discountPerMinute; // discount per minute in WEI
+        uint256 startAt; // start date
+        uint256 expiresAt; // end date
+        bool completed; // true if the auction has already been closed
+    }
+
+    Auction[] public auctions;
 
     // *** EVENTS *** //
 
@@ -54,12 +68,18 @@ contract ClosedEndFund is CEFToken {
         _;
     }
 
+    modifier isAuction() {
+        require(isDutchAuction, "Functions only available for auctions");
+        _;
+    }
+
     constructor(
         string memory _title,
         string memory _description,
         uint256 _tokenPrice,
         uint256 _initialSupply,
         uint256 _tokensPerInvestor,
+        bool _isDutchAuction,
         address[] memory _whiteListedInvestors
     ) CEFToken(_initialSupply) {
         manager = msg.sender;
@@ -67,6 +87,7 @@ contract ClosedEndFund is CEFToken {
         description = _description;
         tokenPrice = _tokenPrice;
         tokensPerInvestor = _tokensPerInvestor;
+        isDutchAuction = _isDutchAuction;
 
         // add investors to mapping
         for (uint256 i = 0; i < _whiteListedInvestors.length; i++) {
@@ -155,6 +176,72 @@ contract ClosedEndFund is CEFToken {
         tokensPerInvestor = _newTokenCap; // set new token price
         emit SetNewTokenCap(tokenPrice); // emit the event
         return tokensPerInvestor;
+    }
+
+    // *** DUTCH AUCTION *** //
+
+    function startAuction(
+        uint256 _amountToSell,
+        uint256 _startingPrice,
+        uint256 _discountPerMinute,
+        uint256 _durationInMinutes
+    ) public isWhiteListed(msg.sender) isAuction {
+        // check amount of tokens
+        uint256 sellerBalance = this.balanceOf(msg.sender);
+        require(
+            sellerBalance >= _amountToSell,
+            "Seller has not enough tokens in its balance"
+        );
+
+        // initalize auction
+        Auction memory newAuction = Auction({
+            seller: msg.sender,
+            amountToSell: _amountToSell,
+            startingPrice: _startingPrice,
+            discountPerMinute: _discountPerMinute,
+            startAt: block.timestamp,
+            expiresAt: block.timestamp + _durationInMinutes * 1 minutes,
+            completed: false
+        });
+
+        // push to auction array
+        auctions.push(newAuction);
+    }
+
+    function getAuctionPrice(uint256 index)
+        public
+        view
+        isAuction
+        returns (uint256)
+    {
+        Auction memory auction = auctions[index]; // access auction
+        uint256 timeElapsed = block.timestamp - auction.startAt; // UNIX; Differnce of 60 = 1 minute
+        uint256 discount = (auction.discountPerMinute * timeElapsed) / 60;
+        return auction.startingPrice - discount;
+    }
+
+    function buyAuctionToken(uint256 index) external payable isAuction {
+        Auction storage auction = auctions[index]; // access auction; storage because need to change variable
+
+        require(!auction.completed, "This auction is completed");
+        require(block.timestamp < auction.expiresAt, "This auction has ended");
+
+        uint256 price = getAuctionPrice(index);
+        require(
+            msg.value >= price,
+            "The amount of ETH sent is less than the price of token"
+        );
+
+        auction.completed = true; // close auction
+
+        _transfer(auction.seller, msg.sender, auction.amountToSell); // transfer token (re-entrancy attack danger?) + if balance to enough transfer aborted
+
+        uint256 refund = msg.value - price;
+        if (refund > 0) {
+            payable(msg.sender).transfer(refund); // refund buyer if payed too much
+        }
+
+        payable(auction.seller).transfer(price); // transfer money to seller
     }
 }
 
