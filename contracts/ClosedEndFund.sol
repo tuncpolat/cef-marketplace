@@ -23,8 +23,10 @@ contract ClosedEndFund is CEFToken {
     string public description; // description of the fund
     uint256 public tokenPrice; // in WEI
     uint256 public tokensPerInvestor; // tokens that investor can buy at once
+    uint256 public timeToBuyInHours; // time frame to buy tokens
+    uint256 public startDate; // start date when CA is deployed
     bool public isDutchAuction; // decide whether it's a dutch auction or waiting list mechanism
-    mapping(address => bool) public whiteListedInvestors; // white-listed investors
+    address[] public waitingList;
 
     // *** STRUCT *** //
     struct Auction {
@@ -39,10 +41,28 @@ contract ClosedEndFund is CEFToken {
 
     Auction[] public auctions;
 
+    // used for waiting list mechanism
+    struct Selling {
+        address seller;
+        uint256 amountToSell; // amount of tokens to sell
+        bool completed; // true if the auction has already been closed
+    }
+
+    Selling[] public sellings;
+
+    struct Investor {
+        bool whiteListed;
+        bool allowToBuy;
+        bool boughtTokens;
+    }
+
+    mapping(address => Investor) public whiteListedInvestors;
+
     // *** EVENTS *** //
 
-    event BuyInitialTokens(
+    event BuyTokens(
         address buyer,
+        address seller,
         uint256 amountOfETH,
         uint256 amountOfTokens
     );
@@ -62,7 +82,7 @@ contract ClosedEndFund is CEFToken {
 
     modifier isWhiteListed(address _address) {
         require(
-            whiteListedInvestors[_address],
+            whiteListedInvestors[_address].whiteListed,
             "You are not a white-listed investor"
         );
         _;
@@ -73,6 +93,14 @@ contract ClosedEndFund is CEFToken {
         _;
     }
 
+    modifier isWaitingList() {
+        require(
+            !isDutchAuction,
+            "Functions only available for waiting list mechanism"
+        );
+        _;
+    }
+
     constructor(
         string memory _title,
         string memory _description,
@@ -80,6 +108,7 @@ contract ClosedEndFund is CEFToken {
         uint256 _initialSupply,
         uint256 _tokensPerInvestor,
         bool _isDutchAuction,
+        uint256 _timeToBuyInHours,
         address[] memory _whiteListedInvestors
     ) CEFToken(_initialSupply) {
         manager = msg.sender;
@@ -88,17 +117,21 @@ contract ClosedEndFund is CEFToken {
         tokenPrice = _tokenPrice;
         tokensPerInvestor = _tokensPerInvestor;
         isDutchAuction = _isDutchAuction;
+        timeToBuyInHours = _timeToBuyInHours;
+        startDate = block.timestamp;
+        waitingList = _whiteListedInvestors;
 
-        // add investors to mapping
+        // add investors to mapping (whitelisting) - O(n) linear algorithm - it's ok if amount of white-listed Investors is small
         for (uint256 i = 0; i < _whiteListedInvestors.length; i++) {
             address whiteListedInvestor = _whiteListedInvestors[i];
-            whiteListedInvestors[whiteListedInvestor] = true;
+            whiteListedInvestors[whiteListedInvestor].whiteListed = true;
+            whiteListedInvestors[whiteListedInvestor].allowToBuy = true;
         }
     }
 
     // *** STO & Transfer *** //
 
-    function buyInitialTokens(uint256 _amountOfTokens)
+    function issue(uint256 _amountOfTokens)
         public
         payable
         isWhiteListed(msg.sender)
@@ -121,10 +154,12 @@ contract ClosedEndFund is CEFToken {
         _transfer(manager, msg.sender, _amountOfTokens);
 
         // emit the event
-        emit BuyInitialTokens(msg.sender, msg.value, _amountOfTokens);
+        emit BuyTokens(msg.sender, manager, msg.value, _amountOfTokens);
 
         return _amountOfTokens;
     }
+
+    // function redeem()
 
     // manager can withdraw to invest (other idea, pay directly through contract)
     function withdraw() public onlyManager {
@@ -136,11 +171,29 @@ contract ClosedEndFund is CEFToken {
     // *** WHITELIST *** //
 
     function addInvestor(address _addressToWhitelist) public onlyManager {
-        whiteListedInvestors[_addressToWhitelist] = true;
+        require(
+            !whiteListedInvestors[_addressToWhitelist].whiteListed,
+            "Already white listed"
+        );
+        whiteListedInvestors[_addressToWhitelist].whiteListed = true;
+        whiteListedInvestors[_addressToWhitelist].allowToBuy = true;
     }
 
     function removeInvestor(address _addressToBlacklist) public onlyManager {
-        whiteListedInvestors[_addressToBlacklist] = false; // kind of blacklist; not really removed
+        require(
+            whiteListedInvestors[_addressToBlacklist].whiteListed,
+            "Already black listed"
+        );
+        whiteListedInvestors[_addressToBlacklist].whiteListed = false;
+        whiteListedInvestors[_addressToBlacklist].allowToBuy = false; // kind of blacklist; not really removed
+
+        // remove from waiting list in an ordered way
+        int256 index = findIndexInArray(_addressToBlacklist);
+        require(index >= 0, "Investor is not found in waiting list");
+        for (uint256 i = uint256(index); i < waitingList.length - 1; i++) {
+            waitingList[i] = waitingList[i + 1];
+        }
+        delete waitingList[waitingList.length - 1];
     }
 
     function verifyInvestor(address _whitelistedAddress)
@@ -148,14 +201,19 @@ contract ClosedEndFund is CEFToken {
         view
         returns (bool)
     {
-        bool investorIsWhitelisted = whiteListedInvestors[_whitelistedAddress];
+        bool investorIsWhitelisted = whiteListedInvestors[_whitelistedAddress]
+            .whiteListed;
         return investorIsWhitelisted;
     }
 
     // *** Corporate Actions *** //
 
     // capital call
-    function mintNewTokens(uint256 _amountOfTokens) public returns (uint256) {
+    function mintNewTokens(uint256 _amountOfTokens)
+        public
+        onlyManager
+        returns (uint256)
+    {
         _mint(manager, _amountOfTokens); // mint new tokens
         emit CapitalCall(_amountOfTokens); // emit the event
         return _amountOfTokens;
@@ -178,8 +236,138 @@ contract ClosedEndFund is CEFToken {
         return tokensPerInvestor;
     }
 
-    // *** DUTCH AUCTION *** //
+    // *** WAITING LIST MECHANISM *** //
 
+    // why selling like this? CSAM needs money, so Investor can't really rely on CA, that it has always enough money + not possible in approve to use CA
+
+    function sellToken(uint256 _amountToSell) public {
+        // check amount of tokens
+        uint256 sellerBalance = this.balanceOf(msg.sender);
+        require(
+            sellerBalance >= _amountToSell,
+            "Seller has not enough tokens in its balance"
+        );
+
+        // initalize selling
+        Selling memory newSelling = Selling({
+            seller: msg.sender,
+            amountToSell: _amountToSell,
+            completed: false
+        });
+
+        // push to sellings array
+        sellings.push(newSelling);
+    }
+
+    function findIndexInArray(address _investor)
+        public
+        view
+        isWaitingList
+        returns (int256)
+    {
+        for (uint256 i = 0; i < waitingList.length; i++) {
+            if (waitingList[i] == _investor) {
+                return int256(i);
+            }
+        }
+        return -1;
+    }
+
+    function buyWLToken(uint256 index, uint256 _amountOfTokens)
+        public
+        payable
+        isWhiteListed(msg.sender)
+        isWaitingList
+        returns (uint256 tokenAmount)
+    {
+        Selling storage selling = sellings[index]; // access selling; storage because need to change variable
+        require(!selling.completed, "This selling is completed");
+        require(
+            tokensPerInvestor > _amountOfTokens,
+            "Tokens per investor cap exceeded"
+        );
+        require(msg.value > 0, "Send ETH to buy some tokens");
+        require(
+            msg.value == _amountOfTokens * tokenPrice,
+            "Send right amount of ETH for the tokens"
+        );
+
+        // check investors balance
+        uint256 sellerBalance = this.balanceOf(selling.seller);
+        require(
+            sellerBalance >= _amountOfTokens,
+            "Seller has not enough tokens (anymore) in its balance"
+        );
+
+        // check waiting list position
+        int256 idx = findIndexInArray(msg.sender);
+        require(idx >= 0, "Investor is not found in waiting list");
+
+        uint256 timeNow = block.timestamp;
+        uint256 timeEnd = startDate +
+            timeToBuyInHours *
+            60 *
+            60 *
+            waitingList.length; //
+        uint256 timeToBuyEnd = startDate +
+            (uint256(idx) + 1) *
+            timeToBuyInHours *
+            60 *
+            60; // time to buy in seconds
+        uint256 timeToBuyStart = startDate +
+            (uint256(idx)) *
+            timeToBuyInHours *
+            60 *
+            60; // time to buy in seconds
+
+        // time is up for all investors
+        if (timeNow > timeEnd) {
+            startDate = timeNow; // reset time
+
+            // reset bought tokens to false again, so investors can start from beginning
+            for (uint256 i = 0; i < waitingList.length; i++) {
+                address investorAddress = waitingList[i];
+                whiteListedInvestors[investorAddress].boughtTokens = false;
+            }
+        }
+
+        // if investor still need to wait
+        require(
+            !(timeToBuyStart > timeNow),
+            "Investors needs to wait. It's too early to buy."
+        );
+
+        // if investor is too late
+        require(
+            !(timeNow > timeToBuyEnd),
+            "Investors needs to wait. It's too late to buy."
+        );
+
+        // else: allow to buy tokens
+
+        // set investor as already bought, so he can't buy more than once in his time frame
+        require(
+            !whiteListedInvestors[msg.sender].boughtTokens,
+            "Investor bought tokens already. Wait until your next turn"
+        );
+        whiteListedInvestors[msg.sender].boughtTokens = true;
+
+        // set completed to true if all tokens are sold
+        selling.amountToSell -= _amountOfTokens;
+        if (selling.amountToSell <= 0) {
+            selling.completed = true;
+        }
+
+        _transfer(selling.seller, msg.sender, _amountOfTokens); // Transfer token to the msg.sender
+
+        emit BuyTokens(msg.sender, selling.seller, msg.value, _amountOfTokens); // emit the event
+
+        payable(selling.seller).transfer(msg.value); // transfer (exact) money to seller
+
+        return (_amountOfTokens);
+    }
+
+    // *** DUTCH AUCTION *** //
     function startAuction(
         uint256 _amountToSell,
         uint256 _startingPrice,
@@ -234,7 +422,7 @@ contract ClosedEndFund is CEFToken {
 
         auction.completed = true; // close auction
 
-        _transfer(auction.seller, msg.sender, auction.amountToSell); // transfer token (re-entrancy attack danger?) + if balance to enough transfer aborted
+        _transfer(auction.seller, msg.sender, auction.amountToSell); // transfer token (re-entrancy attack danger?) + if balance to enough transfer aborted (no-double spending)
 
         uint256 refund = msg.value - price;
         if (refund > 0) {
@@ -250,4 +438,7 @@ Credits:
 https://dev.to/stermi/how-to-create-an-erc20-token-and-a-solidity-vendor-contract-to-sell-buy-your-own-token-4j1m
 https://ethereum.stackexchange.com/questions/68759/buytoken-function-with-erc20-interface
 Whitelist: https://dev.to/emanuelferreira/how-to-create-a-smart-contract-to-whitelist-users-57ki
+Dutch Auction: https://www.quicknode.com/guides/solidity/how-to-create-a-dutch-auction-smart-contract
+FindIndexInArray: https://ethereum.stackexchange.com/questions/121913/get-index-of-element-in-array
+Delete Element in Array: https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
 */
