@@ -532,7 +532,7 @@ contract ClosedEndFund is CEFToken {
         delete waitingList[waitingList.length - 1];
     }
 
-    function verifyInvestor(address _whitelistedAddress)
+    /* function verifyInvestor(address _whitelistedAddress)
         public
         view
         returns (bool)
@@ -540,7 +540,7 @@ contract ClosedEndFund is CEFToken {
         bool investorIsWhitelisted = whiteListedInvestors[_whitelistedAddress]
             .whiteListed;
         return investorIsWhitelisted;
-    }
+    } */
 
     // *** Corporate Actions *** //
 
