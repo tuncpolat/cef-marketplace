@@ -3,7 +3,7 @@ import CEFFactory from "../../build/contracts/CEFFactory.json";
 
 const instance = new web3.eth.Contract(
   CEFFactory.abi,
-  "0xBadEABE2a1Efe1b5eAA7BeC3AADB040F9E202F96" // CA address, Robsten
+  "0x7B361d5F92F48742b9941F6cA4Dc42190E1b2307" // CA address, Robsten
 );
 
 export default instance;
