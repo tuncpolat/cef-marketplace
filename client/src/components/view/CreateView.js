@@ -1,7 +1,7 @@
 import { useState, Fragment } from "react";
 import { useRouter } from "next/router";
-import factory from "../../lib/factory";
-import web3 from "../../lib/web3";
+//import factory from "../../lib/factory";
+//import web3 from "../../lib/web3";
 import {
   PlusIcon,
   TrashIcon,
