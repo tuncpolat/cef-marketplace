@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
 /**
  * @title Closed-End Fund
@@ -43,7 +43,6 @@ contract CEFFactory {
 
 contract CEFToken is ERC20 {
     constructor(address _manager, uint256 initialSupply)
-        payable
         ERC20("CEF TOKEN", "CEF")
     {
         _mint(_manager, initialSupply);
@@ -258,11 +257,6 @@ contract ClosedEndFund is CEFToken {
 
     // *** WAITING LIST MECHANISM *** //
 
-    /**
-    Why selling like this, and not with approve etc. (ERC20)? CSAM needs money, so Investor can't really rely on CA that it has always enough money + not possible in approve to use CA as sender
-    If Waiting List: Manager needs to sell her tokens also thorugh this process
-   **/
-
     function buyIssuedWaitingListTokensFromManager(uint256 _amountOfTokens)
         public
         payable
@@ -425,7 +419,7 @@ contract ClosedEndFund is CEFToken {
             timeToBuyInHours *
             60 *
             60 *
-            waitingList.length; //
+            waitingList.length;
         uint256 timeToBuyEnd = startDate +
             (uint256(idx) + 1) *
             timeToBuyInHours *
@@ -496,7 +490,7 @@ contract ClosedEndFund is CEFToken {
         return _amountOfTokens;
     }
 
-    // manager can withdraw to invest (other idea, pay directly through contract)
+    // manager can withdraw to invest
     function withdraw() public onlyManager {
         uint256 contractBalance = address(this).balance;
         require(contractBalance > 0, "Contract has no balance to withdraw");
@@ -531,16 +525,6 @@ contract ClosedEndFund is CEFToken {
         }
         delete waitingList[waitingList.length - 1];
     }
-
-    /* function verifyInvestor(address _whitelistedAddress)
-        public
-        view
-        returns (bool)
-    {
-        bool investorIsWhitelisted = whiteListedInvestors[_whitelistedAddress]
-            .whiteListed;
-        return investorIsWhitelisted;
-    } */
 
     // *** Corporate Actions *** //
 
@@ -628,16 +612,18 @@ contract ClosedEndFund is CEFToken {
     }
 }
 
-/*
+/***
+Disclosure: 
+To learn Solidity and the concepts behind it we attended the class from Fabian Schär "Smart Contracts and Decentralized Blockchain Applications" and a course on Udemy "Ethereum and Solidity: The Complete Developer's Guide" by Stephen Grider. 
+Concepts like "Factory", "getSummary" and how to implement a front-end with Nextjs were demonstrated in the Udemy course. Concepts like block.timestamp was demonstrated in Fabian Schär's course. 
+Idea and the code are original from the group work. We are not aware of any copies. We are not aware of any third party code, except for the credits below.
+
 Credits:
-https://dev.to/stermi/how-to-create-an-erc20-token-and-a-solidity-vendor-contract-to-sell-buy-your-own-token-4j1m
-https://ethereum.stackexchange.com/questions/68759/buytoken-function-with-erc20-interface
+Buying & Selling: https://dev.to/stermi/how-to-create-an-erc20-token-and-a-solidity-vendor-contract-to-sell-buy-your-own-token-4j1m
+Buying & Selling: https://ethereum.stackexchange.com/questions/68759/buytoken-function-with-erc20-interface
 Whitelist: https://dev.to/emanuelferreira/how-to-create-a-smart-contract-to-whitelist-users-57ki
 Dutch Auction: https://www.quicknode.com/guides/solidity/how-to-create-a-dutch-auction-smart-contract
-FindIndexInArray: https://ethereum.stackexchange.com/questions/121913/get-index-of-element-in-array
+Find Index in Array: https://ethereum.stackexchange.com/questions/121913/get-index-of-element-in-array
 Delete Element in Array: https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
-
-Fractionable: For sake of simplicity: Just make transfers with int numbers, otherwise we need another mechanism. 
-0.5%5E18 = 2.5 x 10^16 - https://ethereum.stackexchange.com/questions/101876/how-to-transfer-a-fraction-of-erc20-token
-
-*/
+Fractionability: https://ethereum.stackexchange.com/questions/101876/how-to-transfer-a-fraction-of-erc20-token
+****/

@@ -9,7 +9,7 @@ if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
 } else {
   // We are on the server *OR* the user is not running metamask
   const provider = new Web3.providers.HttpProvider(
-    `wss://ropsten.infura.io/ws/v3/${process.env.INFURA_TOKEN}`
+    `wss://ropsten.infura.io/ws/v3/${process.env.NEXT_PUBLIC_INFURA_TOKEN}`
   );
   web3 = new Web3(provider);
 }
