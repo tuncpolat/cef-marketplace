@@ -85,7 +85,7 @@ export default function HomeView() {
                   <span className="block text-indigo-400">fund shares</span>
                 </h1>
                 <p className="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                  Overcome and the cumbersome process of transferring shares in
+                  Overcome the cumbersome process of transferring shares in
                   closed-end funds from one qualified investor to another.
                 </p>
                 <div className="mt-10 sm:mt-12">
