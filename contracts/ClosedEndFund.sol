@@ -85,7 +85,6 @@ contract ClosedEndFund is CEFToken {
 
     struct Investor {
         bool whiteListed;
-        bool allowToBuy;
         bool boughtTokens;
     }
 
@@ -155,7 +154,6 @@ contract ClosedEndFund is CEFToken {
         for (uint256 i = 0; i < _whiteListedInvestors.length; i++) {
             address whiteListedInvestor = _whiteListedInvestors[i];
             whiteListedInvestors[whiteListedInvestor].whiteListed = true;
-            whiteListedInvestors[whiteListedInvestor].allowToBuy = true;
         }
     }
 
@@ -256,6 +254,11 @@ contract ClosedEndFund is CEFToken {
     }
 
     // *** WAITING LIST MECHANISM *** //
+
+    /**
+        Why selling like this, and not with approve etc. (ERC20)? CSAM needs money, so Investor can't really rely on CA that it has always enough money + not possible in approve to use CA as sender
+        If Waiting List: Manager needs to sell her tokens also thorugh this process
+    **/
 
     function buyIssuedWaitingListTokensFromManager(uint256 _amountOfTokens)
         public
@@ -505,7 +508,6 @@ contract ClosedEndFund is CEFToken {
             "Already white listed"
         );
         whiteListedInvestors[_addressToWhitelist].whiteListed = true;
-        whiteListedInvestors[_addressToWhitelist].allowToBuy = true;
         waitingList.push(_addressToWhitelist);
     }
 
@@ -514,8 +516,7 @@ contract ClosedEndFund is CEFToken {
             whiteListedInvestors[_addressToBlacklist].whiteListed,
             "Already black listed"
         );
-        whiteListedInvestors[_addressToBlacklist].whiteListed = false;
-        whiteListedInvestors[_addressToBlacklist].allowToBuy = false; // kind of blacklist; not really removed
+        whiteListedInvestors[_addressToBlacklist].whiteListed = false; // kind of blacklist; not really removed
 
         // remove from waiting list in an ordered way
         int256 index = findIndexInArray(_addressToBlacklist);
