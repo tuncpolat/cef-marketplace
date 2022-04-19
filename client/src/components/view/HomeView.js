@@ -8,7 +8,7 @@ const blogPosts = [
     href: "/funds/auction",
     date: "Mar 16, 2020",
     datetime: "2020-03-16",
-    category: { name: "Dutch Auction", href: "/funds/wl" },
+    category: { name: "Dutch Auction", href: "/funds/auction" },
     preview:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.",
     author: {

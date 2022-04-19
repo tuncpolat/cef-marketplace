@@ -303,7 +303,7 @@ export default function Auction() {
               htmlFor="first-name"
               className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
             >
-              Add whitelisted investor
+              Add investor to whitelist
             </label>
             <div className="flex mt-4 sm:mt-0 sm:col-span-2">
               <input
@@ -327,7 +327,7 @@ export default function Auction() {
               htmlFor="first-name"
               className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
             >
-              Remove whitelisted investor
+              Remove investor from whitelist
             </label>
             <div className="flex mt-4 sm:mt-0 sm:col-span-2">
               <input

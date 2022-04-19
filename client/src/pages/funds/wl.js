@@ -61,65 +61,6 @@ export default function WaitingListPage() {
               />
             </div>
           </div>
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-            <label
-              htmlFor="first-name"
-              className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-            >
-              Starting Price of your Auction in WEI
-            </label>
-            <div className="flex mt-4 sm:mt-0 sm:col-span-2">
-              <input
-                type="text"
-                name="first-name"
-                id="first-name"
-                autoComplete="given-name"
-                className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-            <label
-              htmlFor="first-name"
-              className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-            >
-              Discount Rate of your Auction in WEI per Minute
-            </label>
-            <div className="flex mt-4 sm:mt-0 sm:col-span-2">
-              <input
-                type="text"
-                name="first-name"
-                id="first-name"
-                autoComplete="given-name"
-                className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-            <label
-              htmlFor="first-name"
-              className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-            >
-              Expiration Time of your Auction
-            </label>
-            <div className="flex mt-4 sm:mt-0 sm:col-span-2">
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <input
-                  type="text"
-                  name="account-number"
-                  id="account-number"
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md"
-                  placeholder="20-04-2022"
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <CalendarIcon
-                    className="h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                </div>{" "}
-              </div>
-            </div>
-          </div>
           <div className="pt-5">
             <div className="flex justify-end">
               <button
@@ -322,7 +263,7 @@ export default function WaitingListPage() {
               htmlFor="first-name"
               className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
             >
-              Add whitelisted investor
+              Add investor to whitelist
             </label>
             <div className="flex mt-4 sm:mt-0 sm:col-span-2">
               <input
@@ -346,7 +287,7 @@ export default function WaitingListPage() {
               htmlFor="first-name"
               className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
             >
-              Remove whitelisted investor
+              Remove investor from whitelist
             </label>
             <div className="flex mt-4 sm:mt-0 sm:col-span-2">
               <input
