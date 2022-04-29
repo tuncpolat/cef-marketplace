@@ -64,7 +64,7 @@ const AuctionsCards = () => {
               <div className="flex-1 truncate">
                 <div className="flex space-x-3">
                   <h3 className="text-gray-900 text-sm font-medium truncate">
-                    Discount per Minute
+                    Mimimum Price Per Token
                   </h3>
                 </div>
                 <p className="mt-1 text-gray-500 text-sm truncate">
