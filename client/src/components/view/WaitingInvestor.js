@@ -1,5 +1,5 @@
 import { useState } from "react";
-import WaitingList from "../shared/WaitingList";
+import Selling from "../shared/Selling";
 import { CalendarIcon, UserIcon } from "@heroicons/react/solid";
 import Title from "../shared/Title";
 import Space from "../shared/Space";
@@ -18,7 +18,7 @@ export default function WaitingInvestor() {
           title={"Sellings"}
           subtitle={"Buy tokens from other investors."}
         />
-        <WaitingList />
+        <Selling />
       </Space>
 
       <Space>

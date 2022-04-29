@@ -2,6 +2,9 @@ import { useState, Fragment } from "react";
 import { useRouter } from "next/router";
 //import factory from "../../lib/factory";
 //import web3 from "../../lib/web3";
+import Title from "../shared/Title";
+import Space from "../shared/Space";
+
 import {
   PlusIcon,
   TrashIcon,
@@ -10,6 +13,8 @@ import {
   SelectorIcon,
 } from "@heroicons/react/solid";
 import { Listbox, Transition } from "@headlessui/react";
+import CreateWaiting from "./CreateWaiting";
+import CreateDutch from "./CreateDutch";
 
 const mechanism = [
   { id: 1, name: "Waiting List", value: false },
@@ -112,380 +117,291 @@ export default function CreateView() {
   return (
     <div className="pt-10 sm:pt-16 lg:pt-8 pb-10 lg:pb-14 lg:overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <form
-          className="space-y-8 divide-y divide-gray-200"
-          onSubmit={handleSubmit}
-        >
-          <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-            <div>
-              <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Deploy Fund
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  With this information you will deploy a fund on the ropsten
-                  testnet.
-                </p>
+        <form className="space-y-8" onSubmit={handleSubmit}>
+          <Space>
+            <Title
+              title={"Deploy Fund"}
+              subtitle={
+                "With this information you will deploy a fund on the ropsten testnet."
+              }
+            />
+            <div className="space-y-3">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <label
+                  htmlFor="first-name"
+                  className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                >
+                  Title of Fund
+                </label>
+                <div className="mt-1 sm:mt-0 sm:col-span-2">
+                  <input
+                    type="text"
+                    name="first-name"
+                    id="first-name"
+                    autoComplete="given-name"
+                    className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
               </div>
 
-              <div className="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                  <label
-                    htmlFor="first-name"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
-                    Title of Fund
-                  </label>
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <input
-                      type="text"
-                      name="first-name"
-                      id="first-name"
-                      autoComplete="given-name"
-                      className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                  <label
-                    htmlFor="about"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
-                    Description
-                  </label>
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <textarea
-                      id="about"
-                      name="about"
-                      rows={3}
-                      className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                    <p className="mt-2 text-sm text-gray-500">
-                      Write a few sentences about the fund.
-                    </p>
-                  </div>
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                >
+                  Description
+                </label>
+                <div className="mt-1 sm:mt-0 sm:col-span-2">
+                  <textarea
+                    id="about"
+                    name="about"
+                    rows={3}
+                    className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Write a few sentences about the fund.
+                  </p>
                 </div>
               </div>
             </div>
+          </Space>
 
-            <div className="divide-y divide-gray-200 pt-8 space-y-6 sm:pt-10 sm:space-y-5">
-              <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Waiting List vs. Dutch Auction
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Decide whether you want to use a waiting list mechanism or a
-                  dutch auction.
-                </p>
-              </div>
-              <div className="space-y-6 sm:space-y-5 divide-y divide-gray-200">
-                <div className="pt-6 sm:pt-5">
-                  <div role="group" aria-labelledby="label-email">
-                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
-                      <div>
-                        <div
-                          className="text-base font-medium text-gray-900 sm:text-sm sm:text-gray-700"
-                          id="label-email"
-                        >
-                          Mechanism
-                        </div>
+          <Space>
+            <Title
+              title={"Waiting List vs. Dutch Auction"}
+              subtitle={
+                "Decide whether you want to use a waiting list mechanism or a dutch auction."
+              }
+            />
+            <div className="space-y-3">
+              <div className="pt-6 sm:pt-5">
+                <div role="group" aria-labelledby="label-email">
+                  <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
+                    <div>
+                      <div
+                        className="text-base font-medium text-gray-900 sm:text-sm sm:text-gray-700"
+                        id="label-email"
+                      >
+                        Mechanism
                       </div>
-                      <div className="mt-4 sm:mt-0 sm:col-span-2">
-                        <Listbox
-                          value={isDutchAuction}
-                          onChange={setIsDutchAuction}
-                        >
-                          {({ open }) => (
-                            <>
-                              <Listbox.Label className="block text-sm font-medium text-gray-700">
-                                Choose
-                              </Listbox.Label>
-                              <div className="mt-1 relative">
-                                <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                  <span className="block truncate">
-                                    {isDutchAuction.name}
-                                  </span>
-                                  <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                    <SelectorIcon
-                                      className="h-5 w-5 text-gray-400"
-                                      aria-hidden="true"
-                                    />
-                                  </span>
-                                </Listbox.Button>
+                    </div>
+                    <div className="mt-4 sm:mt-0 sm:col-span-2">
+                      <Listbox
+                        value={isDutchAuction}
+                        onChange={setIsDutchAuction}
+                      >
+                        {({ open }) => (
+                          <>
+                            <Listbox.Label className="block text-sm font-medium text-gray-700">
+                              Choose
+                            </Listbox.Label>
+                            <div className="mt-1 relative">
+                              <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <span className="block truncate">
+                                  {isDutchAuction.name}
+                                </span>
+                                <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                  <SelectorIcon
+                                    className="h-5 w-5 text-gray-400"
+                                    aria-hidden="true"
+                                  />
+                                </span>
+                              </Listbox.Button>
 
-                                <Transition
-                                  show={open}
-                                  as={Fragment}
-                                  leave="transition ease-in duration-100"
-                                  leaveFrom="opacity-100"
-                                  leaveTo="opacity-0"
-                                >
-                                  <Listbox.Options className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                    {mechanism.map((person) => (
-                                      <Listbox.Option
-                                        key={person.id}
-                                        className={({ active }) =>
-                                          classNames(
-                                            active
-                                              ? "text-white bg-indigo-600"
-                                              : "text-gray-900",
-                                            "cursor-default select-none relative py-2 pl-3 pr-9"
-                                          )
-                                        }
-                                        value={person}
-                                      >
-                                        {({ isDutchAuction, active }) => (
-                                          <>
+                              <Transition
+                                show={open}
+                                as={Fragment}
+                                leave="transition ease-in duration-100"
+                                leaveFrom="opacity-100"
+                                leaveTo="opacity-0"
+                              >
+                                <Listbox.Options className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                  {mechanism.map((person) => (
+                                    <Listbox.Option
+                                      key={person.id}
+                                      className={({ active }) =>
+                                        classNames(
+                                          active
+                                            ? "text-white bg-indigo-600"
+                                            : "text-gray-900",
+                                          "cursor-default select-none relative py-2 pl-3 pr-9"
+                                        )
+                                      }
+                                      value={person}
+                                    >
+                                      {({ isDutchAuction, active }) => (
+                                        <>
+                                          <span
+                                            className={classNames(
+                                              isDutchAuction
+                                                ? "font-semibold"
+                                                : "font-normal",
+                                              "block truncate"
+                                            )}
+                                          >
+                                            {person.name}
+                                          </span>
+
+                                          {isDutchAuction ? (
                                             <span
                                               className={classNames(
-                                                isDutchAuction
-                                                  ? "font-semibold"
-                                                  : "font-normal",
-                                                "block truncate"
+                                                active
+                                                  ? "text-white"
+                                                  : "text-indigo-600",
+                                                "absolute inset-y-0 right-0 flex items-center pr-4"
                                               )}
                                             >
-                                              {person.name}
+                                              <CheckIcon
+                                                className="h-5 w-5"
+                                                aria-hidden="true"
+                                              />
                                             </span>
-
-                                            {isDutchAuction ? (
-                                              <span
-                                                className={classNames(
-                                                  active
-                                                    ? "text-white"
-                                                    : "text-indigo-600",
-                                                  "absolute inset-y-0 right-0 flex items-center pr-4"
-                                                )}
-                                              >
-                                                <CheckIcon
-                                                  className="h-5 w-5"
-                                                  aria-hidden="true"
-                                                />
-                                              </span>
-                                            ) : null}
-                                          </>
-                                        )}
-                                      </Listbox.Option>
-                                    ))}
-                                  </Listbox.Options>
-                                </Transition>
-                              </div>
-                            </>
-                          )}
-                        </Listbox>
-                      </div>
+                                          ) : null}
+                                        </>
+                                      )}
+                                    </Listbox.Option>
+                                  ))}
+                                </Listbox.Options>
+                              </Transition>
+                            </div>
+                          </>
+                        )}
+                      </Listbox>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </Space>
 
-            <div className="pt-8 space-y-6 sm:pt-10 sm:space-y-5">
-              <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Waiting List
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Give additional information regarding waiting list.
-                </p>
-              </div>
-              <div className="space-y-6 sm:space-y-5">
-                <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                  <label
-                    htmlFor="first-name"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
-                    Token Price in WEI
-                  </label>
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <input
-                      value={tokenPrice}
-                      onChange={(e) => setTokenPrice(e.target.value)}
-                      type="number"
-                      name="first-name"
-                      id="first-name"
-                      autoComplete="given-name"
-                      className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
+          {isDutchAuction.id === 1 ? <CreateWaiting /> : <CreateDutch />}
 
-                <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                  <label
-                    htmlFor="last-name"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
-                    Token Cap for Investor
-                  </label>
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <input
-                      value={tokenCap}
-                      onChange={(e) => setTokenCap(e.target.value)}
-                      type="number"
-                      name="last-name"
-                      id="last-name"
-                      autoComplete="family-name"
-                      className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                  <label
-                    htmlFor="last-name"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
-                    Time to buy Tokens for an Investor in Hours
-                  </label>
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <input
-                      value={timeToBuyInHours}
-                      onChange={(e) => setTimeToBuyInHours(e.target.value)}
-                      type="number"
-                      name="last-name"
-                      id="last-name"
-                      autoComplete="family-name"
-                      className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-                    />
-                  </div>
+          <Space>
+            <Title
+              title={"Issuing"}
+              subtitle={"Decide how many tokens to issue. Manager will"}
+            />
+            <div className="space-y-3">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <label
+                  htmlFor="first-name"
+                  className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                >
+                  Tokens to issue
+                </label>
+                <div className="mt-1 sm:mt-0 sm:col-span-2">
+                  <input
+                    value={initialSupply}
+                    onChange={(e) => setInitialSupply(e.target.value)}
+                    type="number"
+                    name="first-name"
+                    id="first-name"
+                    autoComplete="given-name"
+                    className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+                  />
                 </div>
               </div>
             </div>
+          </Space>
 
-            <div className="pt-8 space-y-6 sm:pt-10 sm:space-y-5">
-              <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Issuing
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Decide how many tokens to issue. Manager will
-                </p>
-              </div>
-              <div className="space-y-6 sm:space-y-5">
-                <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                  <label
-                    htmlFor="first-name"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
-                    Tokens to issue
-                  </label>
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <input
-                      value={initialSupply}
-                      onChange={(e) => setInitialSupply(e.target.value)}
-                      type="number"
-                      name="first-name"
-                      id="first-name"
-                      autoComplete="given-name"
-                      className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-8 space-y-6 sm:pt-10 sm:space-y-5">
-              <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Whitelisting
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  Paste addresses of whitelisted investors. The order is also
-                  the order used in the waiting list.
-                </p>
-              </div>
-              <div className="space-y-6 sm:space-y-5">
-                <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                  <label
-                    htmlFor="first-name"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
-                    Add Whitelisted Investor
-                  </label>
-                  <div className="mt-1 sm:mt-0 sm:col-span-2">
-                    <div className="mt-1 flex rounded-md shadow-sm">
-                      <div className="relative flex items-stretch flex-grow focus-within:z-10">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <UserIcon
-                            className="h-5 w-5 text-gray-400"
-                            aria-hidden="true"
-                          />
-                        </div>
-                        <input
-                          type="text"
-                          value={address}
-                          onChange={handleChangeAddress}
-                          name="address"
-                          id="address"
-                          className="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300"
-                          placeholder="0x..."
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={handleAddAddress}
-                        className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                      >
-                        <PlusIcon
+          <Space>
+            <Title
+              title={"Whitelisting"}
+              subtitle={
+                "Paste addresses of whitelisted investors. The order is also the order used in the waiting list."
+              }
+            />
+            <div className="space-y-3">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <label
+                  htmlFor="first-name"
+                  className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                >
+                  Add Whitelisted Investor
+                </label>
+                <div className="mt-1 sm:mt-0 sm:col-span-2">
+                  <div className="mt-1 flex rounded-md shadow-sm">
+                    <div className="relative flex items-stretch flex-grow focus-within:z-10">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <UserIcon
                           className="h-5 w-5 text-gray-400"
                           aria-hidden="true"
                         />
-                        <span>Add</span>
-                      </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={address}
+                        onChange={handleChangeAddress}
+                        name="address"
+                        id="address"
+                        className="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300"
+                        placeholder="0x..."
+                      />
                     </div>
-                    {addressIsInList ? (
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
-                        Address already in array
-                      </p>
-                    ) : (
-                      ""
-                    )}
-                    {addressList.map((address) => {
-                      return (
-                        <div
-                          className="mt-1 flex rounded-md shadow-sm"
-                          key={address}
-                        >
-                          <div className="relative flex items-stretch flex-grow focus-within:z-10">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <UserIcon
-                                className="h-5 w-5 text-gray-400"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <input
-                              type="text"
-                              name="address"
-                              id="address"
-                              className="cursor-not-allowed focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300"
-                              value={address}
-                              disabled
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveAddress(address)}
-                            className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                          >
-                            <TrashIcon
+
+                    <button
+                      type="button"
+                      onClick={handleAddAddress}
+                      className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <PlusIcon
+                        className="h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                      <span>Add</span>
+                    </button>
+                  </div>
+                  {addressIsInList ? (
+                    <p className="mt-2 text-sm text-red-600" id="email-error">
+                      Address already in array
+                    </p>
+                  ) : (
+                    ""
+                  )}
+                  {addressList.map((address) => {
+                    return (
+                      <div
+                        className="mt-1 flex rounded-md shadow-sm"
+                        key={address}
+                      >
+                        <div className="relative flex items-stretch flex-grow focus-within:z-10">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <UserIcon
                               className="h-5 w-5 text-gray-400"
                               aria-hidden="true"
                             />
-                            <span>Remove</span>
-                          </button>
+                          </div>
+                          <input
+                            type="text"
+                            name="address"
+                            id="address"
+                            className="cursor-not-allowed focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300"
+                            value={address}
+                            disabled
+                          />
                         </div>
-                      );
-                    })}
-                  </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAddress(address)}
+                          className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <TrashIcon
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
+                          <span>Remove</span>
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          </div>
+          </Space>
 
           <div className="pt-5">
             <div className="flex justify-end">

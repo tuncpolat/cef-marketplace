@@ -19,7 +19,7 @@ const posts = [
   },
 ];
 
-const WaitingList = () => {
+const Selling = () => {
   return (
     <div className="mt-6 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
       {posts.map((post) => (
@@ -95,4 +95,4 @@ const WaitingList = () => {
   );
 };
 
-export default WaitingList;
+export default Selling;
