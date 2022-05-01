@@ -102,30 +102,46 @@ contract ClosedEndFund is CEFToken {
     event SetNewTokenCap(uint256 newTokenCap);
 
     // *** MODIFIERS *** //
-    modifier onlyManager() {
+    function _onlyManager() private view {
         require(msg.sender == manager, "Only allowed for fund manager");
+    }
+
+    modifier onlyManager() {
+        _onlyManager();
         _;
     }
 
-    modifier isWhiteListed(address _address) {
+    function _isWhiteListed(address _address) private view {
         require(
             whiteListedInvestors[_address].whiteListed ||
                 (msg.sender == manager),
             "You are not a white-listed investor nor the manager"
         );
+    }
+
+    modifier isWhiteListed(address _address) {
+        _isWhiteListed(_address);
         _;
+    }
+
+    function _isAuction() private view {
+        require(isDutchAuction, "Functions only available for auctions");
     }
 
     modifier isAuction() {
-        require(isDutchAuction, "Functions only available for auctions");
+        _isAuction();
         _;
     }
 
-    modifier isWaitingList() {
+    function _isWaitingList() private view {
         require(
             !isDutchAuction,
             "Functions only available for waiting list mechanism"
         );
+    }
+
+    modifier isWaitingList() {
+        _isWaitingList();
         _;
     }
 
@@ -463,35 +479,6 @@ contract ClosedEndFund is CEFToken {
     }
 
     // *** Manager *** //
-
-    // Demonstration Purpose Only (in prod not possible)
-    function buyFromManager(uint256 _amountOfTokens)
-        public
-        payable
-        isWhiteListed(msg.sender)
-        returns (uint256 tokenAmount)
-    {
-        require(msg.value > 0, "Send ETH to buy some tokens");
-        require(
-            msg.value == _amountOfTokens * tokenPrice,
-            "Send right amount of ETH for the tokens"
-        );
-
-        // check manager balance
-        uint256 managerBalance = this.balanceOf(manager);
-        require(
-            managerBalance >= _amountOfTokens,
-            "Fund manager has not enough tokens in its balance"
-        );
-
-        // Transfer token to the msg.sender
-        _transfer(manager, msg.sender, _amountOfTokens);
-
-        // emit the event
-        emit BuyTokens(msg.sender, manager, msg.value, _amountOfTokens);
-
-        return _amountOfTokens;
-    }
 
     // manager can withdraw to invest
     function withdraw() public onlyManager {

@@ -1,7 +1,7 @@
 import { useState, Fragment } from "react";
 import { useRouter } from "next/router";
 //import factory from "../../lib/factory";
-//import web3 from "../../lib/web3";
+import web3 from "../../lib/web3";
 import Title from "../shared/Title";
 import Space from "../shared/Space";
 
@@ -74,20 +74,21 @@ export default function CreateView() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsDeploying(true);
-    /* 
+
     setErrorMessage("");
     setIsDeploying(true);
     console.log(
       "Form Submit",
-      title,
-      description,
-      tokenPrice,
-      initialSupply,
-      tokenCap,
-      isDutchAuction.value,
-      timeToBuyInHours,
-      addressList
+      typeof title,
+      typeof description,
+      typeof tokenPrice,
+      typeof initialSupply,
+      typeof tokenCap,
+      typeof isDutchAuction.value,
+      typeof timeToBuyInHours,
+      typeof addressList
     );
+
     try {
       const accounts = await web3.eth.getAccounts();
 
@@ -109,24 +110,24 @@ export default function CreateView() {
       router.push("/");
     } catch (error) {
       setErrorMessage(error.message);
-    } */
-    //router.push("/");
-    //setIsDeploying(false);
+    }
+    router.push("/");
+    setIsDeploying(false);
   };
 
   return (
     <div className="pt-10 sm:pt-16 lg:pt-8 pb-10 lg:pb-14 lg:overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <form className="space-y-8" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <Space>
             <Title
-              title={"Deploy Fund"}
+              title={"1. Title and Description"}
               subtitle={
-                "With this information you will deploy a fund on the ropsten testnet."
+                "Please provide a title and a description of the fund you plan to deploy."
               }
             />
             <div className="space-y-3">
-              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
                 <label
                   htmlFor="first-name"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
@@ -146,7 +147,7 @@ export default function CreateView() {
                 </div>
               </div>
 
-              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
                 <label
                   htmlFor="about"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
@@ -172,13 +173,13 @@ export default function CreateView() {
 
           <Space>
             <Title
-              title={"Waiting List vs. Dutch Auction"}
+              title={"2. Price Mechanism"}
               subtitle={
                 "Decide whether you want to use a waiting list mechanism or a dutch auction."
               }
             />
             <div className="space-y-3">
-              <div className="pt-6 sm:pt-5">
+              <div className="pt-6 pt-5">
                 <div role="group" aria-labelledby="label-email">
                   <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
                     <div>
@@ -196,10 +197,7 @@ export default function CreateView() {
                       >
                         {({ open }) => (
                           <>
-                            <Listbox.Label className="block text-sm font-medium text-gray-700">
-                              Choose
-                            </Listbox.Label>
-                            <div className="mt-1 relative">
+                            <div className="relative">
                               <Listbox.Button className="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 <span className="block truncate">
                                   {isDutchAuction.name}
@@ -278,20 +276,34 @@ export default function CreateView() {
             </div>
           </Space>
 
-          {isDutchAuction.id === 1 ? <CreateWaiting /> : <CreateDutch />}
+          {isDutchAuction.id === 1 ? (
+            <CreateWaiting
+              tokenPrice={tokenPrice}
+              setTokenPrice={setTokenPrice}
+              tokenCap={tokenCap}
+              setTokenCap={setTokenCap}
+              timeToBuyInHours={timeToBuyInHours}
+              setTimeToBuyInHours={setTimeToBuyInHours}
+            />
+          ) : (
+            <CreateDutch
+              tokenPrice={tokenPrice}
+              setTokenPrice={setTokenPrice}
+            />
+          )}
 
           <Space>
             <Title
-              title={"Issuing"}
-              subtitle={"Decide how many tokens to issue. Manager will"}
+              title={"3. Minting"}
+              subtitle={"Decide how many tokens to issue."}
             />
             <div className="space-y-3">
-              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
                 <label
                   htmlFor="first-name"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                 >
-                  Tokens to issue
+                  Amount of Tokens
                 </label>
                 <div className="mt-1 sm:mt-0 sm:col-span-2">
                   <input
@@ -310,18 +322,18 @@ export default function CreateView() {
 
           <Space>
             <Title
-              title={"Whitelisting"}
+              title={"4. White-Listing"}
               subtitle={
-                "Paste addresses of whitelisted investors. The order is also the order used in the waiting list."
+                "Please paste the addresses of your white-listed investors in the correct order."
               }
             />
             <div className="space-y-3">
-              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
                 <label
                   htmlFor="first-name"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                 >
-                  Add Whitelisted Investor
+                  Add White-listed Investor
                 </label>
                 <div className="mt-1 sm:mt-0 sm:col-span-2">
                   <div className="mt-1 flex rounded-md shadow-sm">
@@ -436,7 +448,7 @@ export default function CreateView() {
               <div className="flex justify-end">
                 {errorMessage ? (
                   <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-                    <span class="font-medium">Oops!</span> {errorMessage}
+                    <span className="font-medium">Oops!</span> {errorMessage}
                   </p>
                 ) : (
                   ""

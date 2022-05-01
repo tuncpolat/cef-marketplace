@@ -25,9 +25,9 @@ const posts = [
 const AuctionsCards = () => {
   return (
     <div className="mt-6 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-      {posts.map((post) => (
+      {posts.map((post, idx) => (
         <div
-          key={post.title}
+          key={idx}
           className="flex flex-col rounded-lg shadow-lg overflow-hidden"
         >
           <div className="flex-1 bg-white p-6 flex flex-col justify-between">
@@ -88,7 +88,7 @@ const AuctionsCards = () => {
               <div className="flex-1 truncate">
                 <div className="flex space-x-3">
                   <h3 className="text-gray-900 text-sm font-medium truncate">
-                    Amount to Sell
+                    Amount of Tokens for Sale
                   </h3>
                 </div>
                 <p className="mt-1 text-gray-500 text-sm truncate">
@@ -108,14 +108,14 @@ const AuctionsCards = () => {
             </div>
             <button
               type="button"
-              class="text-gray-900 bg-white mt-4 from-purple-600 to-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-300 hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+              className="text-gray-900 bg-white mt-4 from-purple-600 to-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-300 hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
             >
               Get current price
             </button>
             <button
               onClick={() => setOpen(!open)}
               type="button"
-              class="text-white mt-2 bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+              className="text-white mt-2 bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
             >
               Make a bid
             </button>

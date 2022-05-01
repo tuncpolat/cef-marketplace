@@ -1,8 +1,9 @@
 import { useState } from "react";
 import AuctionsCards from "../shared/Auction";
-import { CalendarIcon, UserIcon } from "@heroicons/react/solid";
+import { CalendarIcon } from "@heroicons/react/solid";
 import Title from "../shared/Title";
 import Space from "../shared/Space";
+import QuestionMarkLabel from "../shared/QuestionMarkLabel";
 
 export default function AuctionInvestor() {
   const [addressList, setAddressList] = useState([
@@ -15,26 +16,73 @@ export default function AuctionInvestor() {
     <div className="pt-10 sm:pt-16 lg:pt-8 pb-10 lg:pb-14 lg:overflow-hidden">
       <Space>
         <Title
-          title={"Auctions"}
-          subtitle={"Participate in the auctions to buy your tokens."}
+          title={"Open Auctions"}
+          subtitle={
+            "Currently available tokens - Please place your bid to buy your tokens from other qualified investors."
+          }
         />
         <AuctionsCards />
       </Space>
 
       <Space>
         <Title
-          title={"Start Auction"}
+          title={"Buy Tokens"}
           subtitle={
-            "Start your own auction to sell your tokens. (check balance)"
+            "Enter the amount of tokens you want to buy directly from the fund manager."
+          }
+        />
+        <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
+          <QuestionMarkLabel
+            label={"Calculate Token Price"}
+            info={
+              "Calculation of Ether required to purchase amount of tokens stated."
+            }
+          />
+          <div className="flex flex-col align-start mt-4 sm:mt-0 sm:col-span-2">
+            <input
+              placeholder="Amount of Tokens"
+              type="number"
+              name="first-name"
+              id="first-name"
+              autoComplete="given-name"
+              className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+            />
+            <div className="mt-2 bg-white shadow rounded-lg overflow-hidden p-4">
+              <dt className="text-xs font-medium text-gray-500 truncate">
+                Total Price
+              </dt>
+              <dd className="mt-1 text-md font-semibold text-gray-900">
+                2 ETH
+              </dd>
+            </div>
+          </div>
+        </div>
+        <div className="pt-5">
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Buy Tokens
+            </button>
+          </div>
+        </div>
+      </Space>
+
+      <Space>
+        <Title
+          title={"Start your Auction"}
+          subtitle={
+            "Start your own auction to sell your tokens to other qualified investors."
           }
         />
         <div className="space-y-3">
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
             <label
               htmlFor="first-name"
               className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
             >
-              Amount of Tokens you want to sell
+              Amount of Tokens to Sell
             </label>
             <div className="flex mt-4 sm:mt-0 sm:col-span-2">
               <input
@@ -46,54 +94,60 @@ export default function AuctionInvestor() {
               />
             </div>
           </div>
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-            <label
-              htmlFor="first-name"
-              className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-            >
-              Starting Price of your Auction in WEI
-            </label>
-            <div className="flex mt-4 sm:mt-0 sm:col-span-2">
+          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
+            <QuestionMarkLabel
+              label={"Starting Price"}
+              info={"Price at which the auction will start."}
+            />
+            <div className="mt-1 relative rounded-md shadow-sm">
               <input
-                type="text"
+                type="number"
                 name="first-name"
                 id="first-name"
                 autoComplete="given-name"
-                className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
               />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <span className="text-gray-500 sm:text-sm" id="price-currency">
+                  ETH
+                </span>
+              </div>
             </div>
           </div>
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-            <label
-              htmlFor="first-name"
-              className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-            >
-              Discount Rate of your Auction in WEI per Minute
-            </label>
-            <div className="flex mt-4 sm:mt-0 sm:col-span-2">
+          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
+            <QuestionMarkLabel
+              label={"Minimum Price"}
+              info={
+                "Once the minimum price is reached the auction is terminated."
+              }
+            />
+            <div className="mt-1 relative rounded-md shadow-sm">
               <input
-                type="text"
+                type="number"
                 name="first-name"
                 id="first-name"
                 autoComplete="given-name"
-                className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
               />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <span className="text-gray-500 sm:text-sm" id="price-currency">
+                  ETH
+                </span>
+              </div>
             </div>
           </div>
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-            <label
-              htmlFor="first-name"
-              className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-            >
-              Expiration Time of your Auction
-            </label>
+          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
+            <QuestionMarkLabel
+              label={"Expiration Date"}
+              info={"After this date, the auction is terminated."}
+            />
             <div className="flex mt-4 sm:mt-0 sm:col-span-2">
               <div className="mt-1 relative rounded-md shadow-sm">
                 <input
                   type="text"
                   name="account-number"
                   id="account-number"
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md"
+                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
                   placeholder="20-04-2022"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -120,99 +174,35 @@ export default function AuctionInvestor() {
 
       <Space>
         <Title
-          title={"Issued Tokens"}
-          subtitle={"Buy directly from the issuer."}
-        />
-        <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-          <label
-            htmlFor="first-name"
-            className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-          >
-            Calculate your token price
-          </label>
-          <div className="flex mt-4 sm:mt-0 sm:col-span-2">
-            <input
-              placeholder="How many tokens do you want to buy?"
-              type="text"
-              name="first-name"
-              id="first-name"
-              autoComplete="given-name"
-              className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
-            />
-            <p className="flex items-center ml-3">X 1 ETH = 2 ETH</p>
-          </div>
-        </div>
-        <div className="pt-5">
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Buy Tokens
-            </button>
-          </div>
-        </div>
-      </Space>
-
-      <Space>
-        <Title
-          title={"White-Listing"}
+          title={"White-List"}
           subtitle={"Check if you are white-listed."}
         />
-        <div className="space-y-6 sm:space-y-5">
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+        <div className="space-y-3">
+          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
             <label
               htmlFor="first-name"
               className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
             >
-              Whitelisted Investor
+              Check White-Listed Address
             </label>
-            <div className="mt-1 sm:mt-0 sm:col-span-2">
-              {addressList.map((address) => {
-                return (
-                  <div className="mt-1 flex rounded-md shadow-sm" key={address}>
-                    <div className="relative flex items-stretch flex-grow focus-within:z-10">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <UserIcon
-                          className="h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        name="address"
-                        id="address"
-                        className="cursor-not-allowed focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300"
-                        value={address}
-                        disabled
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-            <label
-              htmlFor="first-name"
-              className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-            >
-              Check token balance
-            </label>
-            <div className="flex mt-4 sm:mt-0 sm:col-span-2">
+            <div className="flex flex-col md:flex-row mt-4 sm:mt-0 sm:col-span-2">
               <input
-                placeholder="Address to check"
+                placeholder="Paste own address"
                 type="text"
                 name="first-name"
                 id="first-name"
                 autoComplete="given-name"
                 className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
               />
+            </div>
+          </div>
+          <div className="pt-5">
+            <div className="flex justify-end">
               <button
                 type="submit"
                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                Check Balance
+                Check Address
               </button>
             </div>
           </div>

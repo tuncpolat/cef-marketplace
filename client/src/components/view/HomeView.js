@@ -4,13 +4,13 @@ import Link from "next/link";
 const blogPosts = [
   {
     id: 1,
-    title: "Interim 03 Fund",
+    title: "CS Multi-Manager Real Estate Global",
     href: "/funds/auction",
     date: "Mar 16, 2020",
     datetime: "2020-03-16",
     category: { name: "Dutch Auction", href: "/funds/auction" },
     preview:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.",
+      "CS (Lux) Multi-Manager Real Estate Global invests in a globally diversified portfolio of non-listed real estate funds using an active selection process. The investment group pursues a core+ investment strategy with a majority of investments in funds pursuing a core investment strategy thereby generating longterm, stable cash flow from rental income. To a lesser extent the investment group invests in value-add and opportunistic real estate funds which strive to achieve attractive risk-adjusted returns.",
     author: {
       name: "Manager",
       href: "/funds/auction",
@@ -19,13 +19,13 @@ const blogPosts = [
   },
   {
     id: 2,
-    title: "CSAM Alternative Assets Fund",
+    title: "Multi-Manager Real Estate SBPH-I",
     href: "/funds/wl",
     date: "Mar 10, 2020",
     datetime: "2020-03-10",
     category: { name: "Waiting List", href: "/funds/wl" },
     preview:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit facilis asperiores porro quaerat doloribus, eveniet dolore. Adipisci tempora aut inventore optio animi., tempore temporibus quo laudantium.",
+      "CS (Lux) Multi-Manager Real Estate SBPH-I CHF invests in a globally diversified portfolio of non-listed real estate funds using an active selection process. The investment group pursues a core+ investment strategy with a majority of investments in funds pursuing a core investment strategy thereby generating longterm, stable cash flow from rental income. To a lesser extent the investment group invests in value-add and opportunistic real estate funds which strive to achieve attractive risk-adjusted returns.",
     author: {
       name: "Manager",
 
@@ -35,13 +35,13 @@ const blogPosts = [
   },
   {
     id: 3,
-    title: "CSAM Real Estate Fund",
+    title: "Multi-Manager Real Estate",
     href: "/funds/wl",
     date: "Feb 12, 2020",
     datetime: "2020-02-12",
     category: { name: "Waiting List", href: "/funds/wl" },
     preview:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint harum rerum voluptatem quo recusandae magni placeat saepe molestiae, sed excepturi cumque corporis perferendis hic.",
+      "CS (Lux) Multi-Manager Real Estate EBPH CHF invests in a globally diversified portfolio of non-listed real estate funds using an active selection process. The investment group pursues a core+ investment strategy with a majority of investments in funds pursuing a core investment strategy thereby generating longterm, stable cash flow from rental income. To a lesser extent the investment group invests in value-add and opportunistic real estate funds which strive to achieve attractive risk-adjusted returns.",
     author: {
       name: "Manager",
       href: "/funds/wl",
@@ -85,7 +85,7 @@ export default function HomeView() {
                   <span className="block text-indigo-400">fund shares</span>
                 </h1>
                 <p className="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                  Overcome the cumbersome process of transferring shares in
+                  Simplify the cumbersome process of transferring shares in
                   closed-end funds from one qualified investor to another.
                 </p>
                 <div className="mt-10 sm:mt-12">
@@ -183,8 +183,8 @@ export default function HomeView() {
                 Meet our team
               </h2>
               <p className="text-xl text-gray-300">
-                Randomly generated team members to work on the CSAM case during
-                the Blockchain Challenge 2022 at the University of Basel.
+                Team members to work on the CSAM case during the Blockchain
+                Challenge 2022 at the University of Basel.
               </p>
             </div>
             <ul
