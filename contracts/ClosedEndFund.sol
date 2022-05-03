@@ -65,8 +65,8 @@ contract ClosedEndFund is CEFToken {
     struct Auction {
         address seller; // addres of seller
         uint256 amountToSell; // amount of tokens to sell
-        uint256 startingPrice; // startin price of auction
-        uint256 discountPerMinute; // discount per minute in WEI
+        uint256 startingPrice; // starting price of auction
+        uint256 minimumPrice; // mimimun price of auction
         uint256 startAt; // start date
         uint256 expiresAt; // end date
         bool completed; // true if the auction has already been closed
@@ -85,7 +85,7 @@ contract ClosedEndFund is CEFToken {
 
     struct Investor {
         bool whiteListed;
-        bool boughtTokens;
+        uint256 timeLastBoughtTokens;
     }
 
     mapping(address => Investor) public whiteListedInvestors;
@@ -208,7 +208,7 @@ contract ClosedEndFund is CEFToken {
     function startAuction(
         uint256 _amountToSell,
         uint256 _startingPrice,
-        uint256 _discountPerMinute,
+        uint256 _minimumPrice,
         uint256 _durationInMinutes
     ) public isWhiteListed(msg.sender) isAuction {
         // check amount of tokens
@@ -223,7 +223,7 @@ contract ClosedEndFund is CEFToken {
             seller: msg.sender,
             amountToSell: _amountToSell,
             startingPrice: _startingPrice,
-            discountPerMinute: _discountPerMinute,
+            minimumPrice: _minimumPrice,
             startAt: block.timestamp,
             expiresAt: block.timestamp + _durationInMinutes * 1 minutes,
             completed: false
@@ -240,9 +240,13 @@ contract ClosedEndFund is CEFToken {
         returns (uint256)
     {
         Auction memory auction = auctions[index]; // access auction
-        uint256 timeElapsed = block.timestamp - auction.startAt; // UNIX; Differnce of 60 = 1 minute
-        uint256 discount = (auction.discountPerMinute * timeElapsed) / 60;
-        return auction.startingPrice - discount;
+        uint256 priceGap = auction.startingPrice - auction.minimumPrice;
+        return
+            (
+                (auction.startingPrice -
+                    ((priceGap * (block.timestamp - auction.startAt)) /
+                        (auction.expiresAt - auction.startAt)))
+            ) * auction.amountToSell;
     }
 
     function buyAuctionToken(uint256 index) external payable isAuction {
@@ -270,11 +274,6 @@ contract ClosedEndFund is CEFToken {
     }
 
     // *** WAITING LIST MECHANISM *** //
-
-    /**
-        Why selling like this, and not with approve etc. (ERC20)? CSAM needs money, so Investor can't really rely on CA that it has always enough money + not possible in approve to use CA as sender
-        If Waiting List: Manager needs to sell her tokens also thorugh this process
-    **/
 
     function buyIssuedWaitingListTokensFromManager(uint256 _amountOfTokens)
         public
@@ -305,18 +304,11 @@ contract ClosedEndFund is CEFToken {
         require(idx >= 0, "Investor is not found in waiting list");
 
         // check time restriction
-        bool checkedTimeRestriction = checkTimeRestriction(uint256(idx));
-        require(
-            checkedTimeRestriction,
-            "It is too late for all investors; reset time"
-        );
+        checkTimeRestriction(uint256(idx));
 
-        // set investor as already bought, so she can't buy more than once in her time frame
-        require(
-            !whiteListedInvestors[msg.sender].boughtTokens,
-            "Investor bought tokens already. Wait until your next turn"
-        );
-        whiteListedInvestors[msg.sender].boughtTokens = true;
+        // after checks: allow to buy
+
+        whiteListedInvestors[msg.sender].timeLastBoughtTokens = block.timestamp;
 
         // Transfer token to the buyer
         _transfer(manager, msg.sender, _amountOfTokens);
@@ -381,22 +373,12 @@ contract ClosedEndFund is CEFToken {
         require(idx >= 0, "Investor is not found in waiting list");
 
         // check time restriction
-        bool checkedTimeRestriction = checkTimeRestriction(uint256(idx));
-        require(
-            checkedTimeRestriction,
-            "It is too late for all investors; reset time"
-        );
-
-        // check if investor bought already in own time frame
-        require(
-            !whiteListedInvestors[msg.sender].boughtTokens,
-            "Investor bought tokens already. Wait until your next turn"
-        );
+        checkTimeRestriction(uint256(idx));
 
         // after checks: allow to buy
 
-        // set investor as already bought, so she can't buy more than once in her time frame
-        whiteListedInvestors[msg.sender].boughtTokens = true;
+        // set time of buying for investor
+        whiteListedInvestors[msg.sender].timeLastBoughtTokens = block.timestamp;
 
         // set completed to true if all tokens are sold
         selling.amountToSell -= _amountOfTokens;
@@ -413,72 +395,7 @@ contract ClosedEndFund is CEFToken {
         return (_amountOfTokens);
     }
 
-    // helper functions
-    function findIndexInArray(address _investor)
-        public
-        view
-        isWaitingList
-        returns (int256)
-    {
-        for (uint256 i = 0; i < waitingList.length; i++) {
-            if (waitingList[i] == _investor) {
-                return int256(i);
-            }
-        }
-        return -1;
-    }
-
-    function checkTimeRestriction(uint256 idx)
-        public
-        isWaitingList
-        returns (bool)
-    {
-        uint256 timeNow = block.timestamp;
-        uint256 timeEnd = startDate +
-            timeToBuyInHours *
-            60 *
-            60 *
-            waitingList.length;
-        uint256 timeToBuyEnd = startDate +
-            (uint256(idx) + 1) *
-            timeToBuyInHours *
-            60 *
-            60; // time to buy in seconds
-        uint256 timeToBuyStart = startDate +
-            (uint256(idx)) *
-            timeToBuyInHours *
-            60 *
-            60; // time to buy in seconds
-
-        // time is up for all investors
-        if (timeNow > timeEnd) {
-            startDate = timeNow; // reset time
-
-            // reset bought tokens to false again, so investors can start from beginning
-            for (uint256 i = 0; i < waitingList.length; i++) {
-                address investorAddress = waitingList[i];
-                whiteListedInvestors[investorAddress].boughtTokens = false;
-            }
-
-            return false;
-        }
-
-        // if investor still need to wait
-        require(
-            !(timeToBuyStart > timeNow),
-            "Investors needs to wait. It's too early to buy."
-        );
-
-        // if investor is too late
-        require(
-            !(timeNow > timeToBuyEnd),
-            "Investors needs to wait. It's too late to buy."
-        );
-
-        return true;
-    }
-
-    // *** Manager *** //
+    // *** Corporate Actions *** //
 
     // manager can withdraw to invest
     function withdraw() public onlyManager {
@@ -487,8 +404,7 @@ contract ClosedEndFund is CEFToken {
         payable(msg.sender).transfer(contractBalance);
     }
 
-    // *** WHITELIST *** //
-
+    // add investor to white-list
     function addInvestor(address _addressToWhitelist) public onlyManager {
         require(
             !whiteListedInvestors[_addressToWhitelist].whiteListed,
@@ -498,6 +414,7 @@ contract ClosedEndFund is CEFToken {
         waitingList.push(_addressToWhitelist);
     }
 
+    // remove investor from white-list
     function removeInvestor(address _addressToBlacklist) public onlyManager {
         require(
             whiteListedInvestors[_addressToBlacklist].whiteListed,
@@ -513,8 +430,6 @@ contract ClosedEndFund is CEFToken {
         }
         delete waitingList[waitingList.length - 1];
     }
-
-    // *** Corporate Actions *** //
 
     // capital call
     function mintNewTokens(uint256 _amountOfTokens)
@@ -566,6 +481,62 @@ contract ClosedEndFund is CEFToken {
     }
 
     //*** Helper ***//
+
+    function findIndexInArray(address _investor)
+        public
+        view
+        isWaitingList
+        returns (int256)
+    {
+        for (uint256 i = 0; i < waitingList.length; i++) {
+            if (waitingList[i] == _investor) {
+                return int256(i);
+            }
+        }
+        return -1;
+    }
+
+    function checkTimeRestriction(uint256 idx) public view isWaitingList {
+        uint256 timeEnd = startDate +
+            timeToBuyInHours *
+            60 *
+            60 *
+            waitingList.length; // end time of array calculated from startDate (one circle)
+
+        uint256 timeNow = ((block.timestamp - startDate) %
+            (timeEnd - startDate)) + startDate; // time now calculated with modulo
+
+        uint256 timeToBuyStart = startDate +
+            (uint256(idx)) *
+            timeToBuyInHours *
+            60 *
+            60; // time to buy: slot start for investor
+
+        uint256 timeToBuyEnd = startDate +
+            (uint256(idx) + 1) *
+            timeToBuyInHours *
+            60 *
+            60; // time to buy: slot end for investor
+
+        // check if investor bought in the last x hours
+        require(
+            !(whiteListedInvestors[msg.sender].timeLastBoughtTokens >
+                block.timestamp - timeToBuyInHours * 60 * 60),
+            "Investor bought tokens already. Wait until your next turn"
+        );
+
+        // if investor still needs to wait
+        require(
+            !(timeToBuyStart > timeNow),
+            "Investors needs to wait. It's too early to buy."
+        );
+
+        // if investor is too late
+        require(
+            !(timeNow > timeToBuyEnd),
+            "Investors needs to wait. It's too late to buy."
+        );
+    }
 
     function getSummary()
         public

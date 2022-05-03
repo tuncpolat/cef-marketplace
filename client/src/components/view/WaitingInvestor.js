@@ -15,7 +15,7 @@ export default function WaitingInvestor() {
     <div className="pt-10 sm:pt-16 lg:pt-8 pb-10 lg:pb-14 lg:overflow-hidden">
       <Space>
         <Title
-          title={"Sellings"}
+          title={"Selling Postitions"}
           subtitle={"Buy tokens from other investors."}
         />
         <Selling />

@@ -1,5 +1,5 @@
 import web3 from "./web3";
-import CEFFactory from "../../../build/contracts/CEFFactory.json";
+import CEFFactory from "../abi/CEFFactory.json";
 
 const instance = new web3.eth.Contract(
   CEFFactory.abi,
