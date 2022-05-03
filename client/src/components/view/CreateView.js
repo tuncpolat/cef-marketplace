@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import web3 from "../../lib/web3";
 import Title from "../shared/Title";
 import Space from "../shared/Space";
+import QuestionMarkLabel from "../shared/QuestionMarkLabel";
 
 import {
   PlusIcon,
@@ -14,7 +15,6 @@ import {
 } from "@heroicons/react/solid";
 import { Listbox, Transition } from "@headlessui/react";
 import CreateWaiting from "./CreateWaiting";
-import CreateDutch from "./CreateDutch";
 
 const mechanism = [
   { id: 1, name: "Waiting List", value: false },
@@ -179,7 +179,7 @@ export default function CreateView() {
               }
             />
             <div className="space-y-3">
-              <div className="pt-6 pt-5">
+              <div className="pt-5">
                 <div role="group" aria-labelledby="label-email">
                   <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
                     <div>
@@ -286,10 +286,7 @@ export default function CreateView() {
               setTimeToBuyInHours={setTimeToBuyInHours}
             />
           ) : (
-            <CreateDutch
-              tokenPrice={tokenPrice}
-              setTokenPrice={setTokenPrice}
-            />
+            ""
           )}
 
           <Space>
@@ -298,6 +295,35 @@ export default function CreateView() {
               subtitle={"Decide how many tokens to issue."}
             />
             <div className="space-y-3">
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
+                <QuestionMarkLabel
+                  label={"Token Price"}
+                  info={
+                    "This will be the price at which qualified investors can buy issued tokens directly from the manager."
+                  }
+                />
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <input
+                    value={tokenPrice}
+                    onChange={(e) => setTokenPrice(e.target.value)}
+                    type="number"
+                    name="price"
+                    id="price"
+                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+                    placeholder="1"
+                    aria-describedby="price-currency"
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <span
+                      className="text-gray-500 sm:text-sm"
+                      id="price-currency"
+                    >
+                      ETH
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 pt-5">
                 <label
                   htmlFor="first-name"
