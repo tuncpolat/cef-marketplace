@@ -10,7 +10,7 @@ const navigation = [
 
 export function Header() {
   return (
-    <Popover as="header" className="relative">
+    <Popover as="header" className="relative z-50">
       <div className="bg-gray-900 py-4">
         <nav
           className="relative max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6"

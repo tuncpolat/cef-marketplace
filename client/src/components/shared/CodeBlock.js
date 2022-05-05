@@ -4,20 +4,16 @@ import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 const CodeBlock = {
   code({ node, inline, className, children, ...props }) {
-    const match = /language-(\w+)/.exec(className || "");
-    return !inline && match ? (
+    return (
       <SyntaxHighlighter
         style={dracula}
-        language={match[1]}
-        PreTag="div"
+        language="javascript"
+        className={className}
+        showLineNumbers
         {...props}
       >
-        {String(children).replace(/\n$/, "")}
-      </SyntaxHighlighter>
-    ) : (
-      <code className={className} {...props}>
         {children}
-      </code>
+      </SyntaxHighlighter>
     );
   },
 };
