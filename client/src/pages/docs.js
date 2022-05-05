@@ -65,6 +65,40 @@ const variables = [
   },
 ];
 
+const corporateactions = [
+  {
+    name: "withdraw",
+    description: "Only manager can withdraw the money from the contract.",
+  },
+  {
+    name: "addInvestor",
+    description: "Only manager can add an investor to the white-list.",
+  },
+  {
+    name: "removeInvestor",
+    description: "Only manager can remove an investor from the white-list.",
+  },
+  {
+    name: "mintNewTokens",
+    description: "Only manager can mint new tokens.",
+  },
+  {
+    name: "setTokenPrice",
+    description:
+      "Only manager can set the token price; used as NAV for the waiting list mechanism and the price of the issued tokens in funds based on dutch auctions.",
+  },
+  {
+    name: "setTokenPerInvestor",
+    description:
+      "Only manager can set the token cap per investor; How many tokens a qualified investor can buy at once.",
+  },
+  {
+    name: "setTimeSlot",
+    description:
+      "Only manager can set the time slot per investor; How long a qualified investor has time to decide wheter to invest or not.",
+  },
+];
+
 const events = [
   {
     name: "BuyTokens",
@@ -84,6 +118,49 @@ const events = [
     name: "SetNewTokenCap",
     description:
       "Emit event after setting new token cap for waiting list mechanism.",
+  },
+];
+
+const credits = [
+  {
+    topic: "Buying & Selling",
+    link: "https://dev.to/stermi/how-to-create-an-erc20-token-and-a-solidity-vendor-contract-to-sell-buy-your-own-token-4j1m",
+  },
+  {
+    topic: "Buying & Selling",
+    link: "https://ethereum.stackexchange.com/questions/68759/buytoken-function-with-erc20-interface",
+  },
+  {
+    topic: "Whitelist",
+    link: "https://dev.to/emanuelferreira/how-to-create-a-smart-contract-to-whitelist-users-57ki",
+  },
+  {
+    topic: "Dutch Auction",
+    link: "https://www.quicknode.com/guides/solidity/how-to-create-a-dutch-auction-smart-contract",
+  },
+  {
+    topic: "Find Index in Array",
+    link: "https://ethereum.stackexchange.com/questions/121913/get-index-of-element-in-array",
+  },
+  {
+    topic: "Delete Element in Array",
+    link: "https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array",
+  },
+  {
+    topic: "Fractionability",
+    link: "https://ethereum.stackexchange.com/questions/101876/how-to-transfer-a-fraction-of-erc20-token",
+  },
+  {
+    topic: "Fractionability",
+    link: "https://thetombomb.com/posts/adding-code-snippets-to-static-markdown-in-Next%20js",
+  },
+  {
+    topic: "Save bytecode in modifiers",
+    link: "https://www.youtube.com/watch?v=XDqD3X8DCiw",
+  },
+  {
+    topic: "Front-End - Markdown highlighting",
+    link: "https://thetombomb.com/posts/adding-code-snippets-to-static-markdown-in-Next%20js",
   },
 ];
 
@@ -347,7 +424,7 @@ export default function Docs() {
       string public description; // description of the fund
       uint256 public tokenPrice; // in WEI
       uint256 public tokensPerInvestor; // tokens that investor can buy at once
-      uint256 public timeToBuyInHours; // time frame to buy tokens
+      uint256 public timeToBuyInHours; // time slot to buy tokens
       uint256 public startDate; // start date when CA is deployed
       bool public isDutchAuction; // decide whether it's a dutch auction or waiting list mechanism
       address[] public waitingList;
@@ -391,6 +468,7 @@ export default function Docs() {
       event CapitalCall(uint256 amountOfTokens);
       event SetNewTokenPrice(uint256 newTokenPrice);
       event SetNewTokenCap(uint256 newTokenCap);
+      event SetNewTimeToBuyInHours(uint256 newTimeToBuyInHours);
       ...
     }
 `}
@@ -472,18 +550,19 @@ export default function Docs() {
                         Dutch Auction
                       </h2>
                       <p className="mt-1 text-gray-500">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Maxime mollitia, molestiae quas vel sint commodi
-                        repudiandae consequuntur voluptatum laborum numquam
-                        blanditiis harum quisquam eius sed odit fugiat iusto
-                        fuga praesentium optio, eaque rerum! Provident similique
-                        accusantium nemo autem. Veritatis obcaecati tenetur iure
-                        eius earum ut molestias architecto voluptate aliquam
-                        nihil, eveniet aliquid culpa officia aut! Impedit sit
-                        sunt quaerat, odit, tenetur error, harum nesciunt ipsum
-                        debitis quas aliquid. Reprehenderit, quia. Quo neque
-                        error repudiandae fuga? Ipsa laudantium molestias eos
-                        sapiente officiis modi at sunt exceptur
+                        The dutch auction has mainly three functionalities. A
+                        qualified investor can start a dutch auction
+                        (startAuction), check the price of a particular auction
+                        (getAuctionPrice), and make a bid for an auction to buy
+                        tokens from other qualified investors (buyAuctionToken).
+                        The function buyIssuedAuctionTokensFromManager allows
+                        investors to buy issued tokens directly from the fund
+                        manager with the price the manager sets for the tokens
+                        (tokenPrice). We had to develop two functions to buy
+                        directly from the manager, one for contracts based on
+                        dutch auctions (buyIssuedAuctionTokensFromManager) and
+                        one for funds based on waiting list mechanisms
+                        (buyIssuedWaitingListTokensFromManager).
                       </p>
                       <ReactMarkdown components={CodeBlock}>
                         {`
@@ -597,18 +676,14 @@ export default function Docs() {
                         Waiting List
                       </h2>
                       <p className="mt-1 text-gray-500">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Maxime mollitia, molestiae quas vel sint commodi
-                        repudiandae consequuntur voluptatum laborum numquam
-                        blanditiis harum quisquam eius sed odit fugiat iusto
-                        fuga praesentium optio, eaque rerum! Provident similique
-                        accusantium nemo autem. Veritatis obcaecati tenetur iure
-                        eius earum ut molestias architecto voluptate aliquam
-                        nihil, eveniet aliquid culpa officia aut! Impedit sit
-                        sunt quaerat, odit, tenetur error, harum nesciunt ipsum
-                        debitis quas aliquid. Reprehenderit, quia. Quo neque
-                        error repudiandae fuga? Ipsa laudantium molestias eos
-                        sapiente officiis modi at sunt exceptur
+                        The waiting list is considered when an investor wants to
+                        buy tokens from other qualified investors or directly
+                        from the manager. The logic to decide whether an
+                        investor is in the correct position on the waiting list,
+                        so eligible to buy, is predominantly determined by the
+                        two helper functions findIndexInArray and
+                        checkTimeRestriction. These two functions are explained
+                        below in the chapter Helper Functions.
                       </p>
                       <ReactMarkdown components={CodeBlock}>
                         {`
@@ -749,19 +824,47 @@ export default function Docs() {
                         Corporate Actions
                       </h2>
                       <p className="mt-1 text-gray-500">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Maxime mollitia, molestiae quas vel sint commodi
-                        repudiandae consequuntur voluptatum laborum numquam
-                        blanditiis harum quisquam eius sed odit fugiat iusto
-                        fuga praesentium optio, eaque rerum! Provident similique
-                        accusantium nemo autem. Veritatis obcaecati tenetur iure
-                        eius earum ut molestias architecto voluptate aliquam
-                        nihil, eveniet aliquid culpa officia aut! Impedit sit
-                        sunt quaerat, odit, tenetur error, harum nesciunt ipsum
-                        debitis quas aliquid. Reprehenderit, quia. Quo neque
-                        error repudiandae fuga? Ipsa laudantium molestias eos
-                        sapiente officiis modi at sunt exceptur
+                        The functionalites of the corporate actions are
+                        descriped in the table below.
                       </p>
+                      <div className="mt-8 mb-8 flex flex-col">
+                        <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                              <table className="min-w-full divide-y divide-gray-300">
+                                <thead className="bg-gray-50">
+                                  <tr>
+                                    <th
+                                      scope="col"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                                    >
+                                      Functions
+                                    </th>
+                                    <th
+                                      scope="col"
+                                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                      Description
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                  {corporateactions.map((action) => (
+                                    <tr key={action.name}>
+                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                        {action.name}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {action.description}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                       <ReactMarkdown components={CodeBlock}>
                         {`
 
@@ -815,7 +918,11 @@ export default function Docs() {
       }
 
       // set new token price
-      function setTokenPrice(uint256 _newTokenPrice) public returns (uint256) {
+      function setTokenPrice(uint256 _newTokenPrice) 
+          public 
+          onlyManager 
+          returns (uint256) 
+      {
           tokenPrice = _newTokenPrice; // set new token price
           emit SetNewTokenPrice(tokenPrice); // emit the event
           return tokenPrice;
@@ -824,11 +931,23 @@ export default function Docs() {
       // set new token per investor
       function setTokenPerInvestor(uint256 _newTokenCap)
           public
+          onlyManager
           returns (uint256)
       {
           tokensPerInvestor = _newTokenCap; // set new token price
           emit SetNewTokenCap(tokenPrice); // emit the event
           return tokensPerInvestor;
+      }
+
+      // set new time slot 
+      function setTimeSlot(uint256 _NewTimeToBuyInHours)
+          public 
+          onlyManager 
+          returns (uint256) 
+      {
+          timeToBuyInHours = _NewTimeToBuyInHours; // set new token price
+          emit SetNewTimeToBuyInHours(timeToBuyInHours); // emit the event
+          return timeToBuyInHours;
       }
       ...
     }
@@ -843,18 +962,16 @@ export default function Docs() {
                         Helper Functions
                       </h2>
                       <p className="mt-1 text-gray-500">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Maxime mollitia, molestiae quas vel sint commodi
-                        repudiandae consequuntur voluptatum laborum numquam
-                        blanditiis harum quisquam eius sed odit fugiat iusto
-                        fuga praesentium optio, eaque rerum! Provident similique
-                        accusantium nemo autem. Veritatis obcaecati tenetur iure
-                        eius earum ut molestias architecto voluptate aliquam
-                        nihil, eveniet aliquid culpa officia aut! Impedit sit
-                        sunt quaerat, odit, tenetur error, harum nesciunt ipsum
-                        debitis quas aliquid. Reprehenderit, quia. Quo neque
-                        error repudiandae fuga? Ipsa laudantium molestias eos
-                        sapiente officiis modi at sunt exceptur
+                        The two helper functions findIndexInArray and
+                        checkTimeRestriction are used to determine if an
+                        investor is in the correct waiting list position and,
+                        therefore, allowed to buy. The idea behind it is to
+                        check where the index of the investor on the waiting
+                        list is and then compare it with time components. In
+                        order to avoid shifting the waiting list array, the
+                        modulo operator is used. The getSummary function is a
+                        helper function for simplifying the front-end. It allows
+                        to fetch all the information from a single contract.
                       </p>
                       <ReactMarkdown components={CodeBlock}>
                         {`
@@ -979,41 +1096,77 @@ export default function Docs() {
                     </div>
                   </div>
 
+                  <div className="mt-6" id="frontend">
+                    <div>
+                      <h2 className="text-lg leading-6 font-medium text-gray-900">
+                        Front-End
+                      </h2>
+                      <p className="mt-1 text-gray-500">
+                        The front-end is the web application that allows the
+                        investor and the manager to interact with the contracts.
+                        The framework we used is Nextjs. Additionally, we
+                        injected Web3 library to connect with the blockchain.
+                      </p>
+                    </div>
+                  </div>
+
                   <div className="mt-6" id="credits">
                     <div>
                       <h2 className="text-lg leading-6 font-medium text-gray-900">
-                        Credits
+                        Credits & Disclosure
                       </h2>
                       <p className="mt-1 text-gray-500">
-                        Disclosure: To learn Solidity and the concepts behind it
-                        we attended the class from Prof. Dr. Fabian Schär "Smart
-                        Contracts and Decentralized Blockchain Applications" and
-                        a course on Udemy "Ethereum and Solidity: The Complete
+                        To learn Solidity and the concepts behind it we attended
+                        the class from Prof. Dr. Fabian Schär "Smart Contracts
+                        and Decentralized Blockchain Applications" and a course
+                        on Udemy "Ethereum and Solidity: The Complete
                         Developer's Guide" by Stephen Grider. Concepts like
                         "Factory", "getSummary" and how to implement a front-end
                         with Nextjs were demonstrated in the Udemy course.
                         Concepts like block.timestamp was demonstrated in Prof.
-                        Dr. Fabian Schär's course. Idea and the code are
-                        original from the group work. We are not aware of any
+                        Dr. Fabian Schär's course. Implementation of the code
+                        are original from the CSAM team. We are not aware of any
                         copies. We are not aware of any third party code, except
-                        for the credits below. Credits: Buying & Selling:
-                        https://dev.to/stermi/how-to-create-an-erc20-token-and-a-solidity-vendor-contract-to-sell-buy-your-own-token-4j1m
-                        Buying & Selling:
-                        https://ethereum.stackexchange.com/questions/68759/buytoken-function-with-erc20-interface
-                        Whitelist:
-                        https://dev.to/emanuelferreira/how-to-create-a-smart-contract-to-whitelist-users-57ki
-                        Dutch Auction:
-                        https://www.quicknode.com/guides/solidity/how-to-create-a-dutch-auction-smart-contract
-                        Find Index in Array:
-                        https://ethereum.stackexchange.com/questions/121913/get-index-of-element-in-array
-                        Delete Element in Array:
-                        https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
-                        Fractionability:
-                        https://ethereum.stackexchange.com/questions/101876/how-to-transfer-a-fraction-of-erc20-token
-                        https://thetombomb.com/posts/adding-code-snippets-to-static-markdown-in-Next%20js
-                        Save bytecode in modifiers:
-                        https://www.youtube.com/watch?v=XDqD3X8DCiw Topic/Link
+                        for the credits below.
                       </p>
+                      <div className="mt-8 mb-8 flex flex-col">
+                        <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                              <table className="min-w-full divide-y divide-gray-300">
+                                <thead className="bg-gray-50">
+                                  <tr>
+                                    <th
+                                      scope="col"
+                                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                                    >
+                                      Topic
+                                    </th>
+                                    <th
+                                      scope="col"
+                                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                    >
+                                      Link
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                  {credits.map((credit) => (
+                                    <tr key={credit.name}>
+                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                        {credit.topic}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        <a href={credit.link}>{credit.link}</a>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
