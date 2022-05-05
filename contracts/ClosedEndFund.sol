@@ -56,10 +56,10 @@ contract ClosedEndFund is CEFToken {
     string public description; // description of the fund
     uint256 public tokenPrice; // in WEI
     uint256 public tokensPerInvestor; // tokens that investor can buy at once
-    uint256 public timeToBuyInHours; // time frame to buy tokens
+    uint256 public timeToBuyInHours; // time slot to buy tokens
     uint256 public startDate; // start date when CA is deployed
     bool public isDutchAuction; // decide whether it's a dutch auction or waiting list mechanism
-    address[] public waitingList;
+    address[] public waitingList; // waiting list array with ordered position
 
     // *** STRUCT *** //
     struct Auction {
@@ -84,8 +84,8 @@ contract ClosedEndFund is CEFToken {
     Selling[] public sellings;
 
     struct Investor {
-        bool whiteListed;
-        uint256 timeLastBoughtTokens;
+        bool whiteListed; // true if white-listed
+        uint256 timeLastBoughtTokens; // check for waiting list mechanism if investor bought in the last timeToBuyInHours
     }
 
     mapping(address => Investor) public whiteListedInvestors;
@@ -100,6 +100,7 @@ contract ClosedEndFund is CEFToken {
     event CapitalCall(uint256 amountOfTokens);
     event SetNewTokenPrice(uint256 newTokenPrice);
     event SetNewTokenCap(uint256 newTokenCap);
+    event SetNewTimeToBuyInHours(uint256 newTimeToBuyInHours);
 
     // *** MODIFIERS *** //
     function _onlyManager() private view {
@@ -443,7 +444,11 @@ contract ClosedEndFund is CEFToken {
     }
 
     // set new token price
-    function setTokenPrice(uint256 _newTokenPrice) public returns (uint256) {
+    function setTokenPrice(uint256 _newTokenPrice)
+        public
+        onlyManager
+        returns (uint256)
+    {
         tokenPrice = _newTokenPrice; // set new token price
         emit SetNewTokenPrice(tokenPrice); // emit the event
         return tokenPrice;
@@ -452,6 +457,7 @@ contract ClosedEndFund is CEFToken {
     // set new token per investor
     function setTokenPerInvestor(uint256 _newTokenCap)
         public
+        onlyManager
         returns (uint256)
     {
         tokensPerInvestor = _newTokenCap; // set new token price
@@ -459,25 +465,15 @@ contract ClosedEndFund is CEFToken {
         return tokensPerInvestor;
     }
 
-    //*** ERC20 OVERRIDE ***//
-    function transfer(address _recipient, uint256 _amount)
+    // set new time slot
+    function setTimeSlot(uint256 _NewTimeToBuyInHours)
         public
-        override
         onlyManager
-        returns (bool)
+        returns (uint256)
     {
-        _transfer(msg.sender, _recipient, _amount);
-        return true;
-    }
-
-    function approve(address spender, uint256 amount)
-        public
-        override
-        onlyManager
-        returns (bool)
-    {
-        _approve(msg.sender, spender, amount);
-        return true;
+        timeToBuyInHours = _NewTimeToBuyInHours; // set new token price
+        emit SetNewTimeToBuyInHours(timeToBuyInHours); // emit the event
+        return timeToBuyInHours;
     }
 
     //*** Helper ***//
@@ -569,20 +565,27 @@ contract ClosedEndFund is CEFToken {
             sellings
         );
     }
+
+    //*** ERC20 OVERRIDE ***//
+
+    // override to avoid transfering shares outside of fund
+    function transfer(address _recipient, uint256 _amount)
+        public
+        override
+        onlyManager
+        returns (bool)
+    {
+        _transfer(msg.sender, _recipient, _amount);
+        return true;
+    }
+
+    function approve(address spender, uint256 amount)
+        public
+        override
+        onlyManager
+        returns (bool)
+    {
+        _approve(msg.sender, spender, amount);
+        return true;
+    }
 }
-
-/***
-Disclosure: 
-To learn Solidity and the concepts behind it we attended the class from Fabian Schär "Smart Contracts and Decentralized Blockchain Applications" and a course on Udemy "Ethereum and Solidity: The Complete Developer's Guide" by Stephen Grider. 
-Concepts like "Factory", "getSummary" and how to implement a front-end with Nextjs were demonstrated in the Udemy course. Concepts like block.timestamp was demonstrated in Fabian Schär's course. 
-Idea and the code are original from the group work. We are not aware of any copies. We are not aware of any third party code, except for the credits below.
-
-Credits:
-Buying & Selling: https://dev.to/stermi/how-to-create-an-erc20-token-and-a-solidity-vendor-contract-to-sell-buy-your-own-token-4j1m
-Buying & Selling: https://ethereum.stackexchange.com/questions/68759/buytoken-function-with-erc20-interface
-Whitelist: https://dev.to/emanuelferreira/how-to-create-a-smart-contract-to-whitelist-users-57ki
-Dutch Auction: https://www.quicknode.com/guides/solidity/how-to-create-a-dutch-auction-smart-contract
-Find Index in Array: https://ethereum.stackexchange.com/questions/121913/get-index-of-element-in-array
-Delete Element in Array: https://ethereum.stackexchange.com/questions/1527/how-to-delete-an-element-at-a-certain-index-in-an-array
-Fractionability: https://ethereum.stackexchange.com/questions/101876/how-to-transfer-a-fraction-of-erc20-token
-****/

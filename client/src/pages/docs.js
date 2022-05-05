@@ -204,7 +204,7 @@ export default function Docs() {
                     <p className="mt-1 text-gray-500">
                       This is the technical documentation for the CSAM project
                       at the Blockchain Challenge 2022 at the University of
-                      Basel. The GitHub repository can be found
+                      Basel. The GitHub repository can be found{" "}
                       <a
                         href="https://github.com/tuncpolat/cef-marketplace"
                         target="_blank"
@@ -427,7 +427,7 @@ export default function Docs() {
       uint256 public timeToBuyInHours; // time slot to buy tokens
       uint256 public startDate; // start date when CA is deployed
       bool public isDutchAuction; // decide whether it's a dutch auction or waiting list mechanism
-      address[] public waitingList;
+      address[] public waitingList; // waiting list array with ordered position
 
       // *** STRUCT *** //
       struct Auction {
@@ -452,8 +452,8 @@ export default function Docs() {
       Selling[] public sellings;
 
       struct Investor {
-          bool whiteListed;
-          uint timeLastBoughtTokens;
+          bool whiteListed; // true if white-listed
+          uint timeLastBoughtTokens; // check for waiting list mechanism if investor bought in the last timeToBuyInHours
       }
 
       mapping(address => Investor) public whiteListedInvestors;
@@ -1071,6 +1071,8 @@ export default function Docs() {
       }
 
       //*** ERC20 OVERRIDE ***//
+
+      // override to avoid transfering shares outside of fund
       function transfer(address _recipient, uint256 _amount)
           public
           override
