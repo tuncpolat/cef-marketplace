@@ -1,24 +1,52 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import AuctionInvestor from "../../components/view/AuctionInvestor";
 import AuctionManager from "../../components/view/AuctionManager";
 import { Dialog, Transition } from "@headlessui/react";
+import Cef from "../../lib/cef";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Auction() {
+export default function Auction({ address }) {
+  const [loading, setLoading] = useState(false);
+  const [fund, setFund] = useState(null);
   const [open, setOpen] = useState(false);
-  const [address, setAddress] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [tabs, setTabs] = useState([
     { name: "Manage Investment", current: 0 },
     { name: "Manage Fund", current: 1 },
   ]);
 
+  useEffect(() => {
+    const fetchFund = async () => {
+      if (address) {
+        setLoading(true);
+        const fund = Cef(address);
+        const data = await fund.methods.getSummary().call();
+        console.log(data);
+        setFund({
+          manager: data[0],
+          title: data[1],
+          description: data[2],
+        });
+      }
+
+      setLoading(false);
+    };
+
+    fetchFund();
+  }, [address]);
+
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 lg:px-8 pt-4">
+        <div className="max-w-xl mt-8">
+          <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+            {fund.title}
+          </h2>
+          <p className="mt-5 text-xl text-gray-500">{fund.description}</p>
+        </div>
         <div className="sm:hidden">
           <label htmlFor="tabs" className="sr-only">
             Select a tab
@@ -167,4 +195,10 @@ export default function Auction() {
       </Transition.Root>
     </>
   );
+}
+
+export async function getServerSideProps({ query }) {
+  return {
+    props: { address: query.address }, // will be passed to the page component as props
+  };
 }

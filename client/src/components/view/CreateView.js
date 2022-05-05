@@ -1,6 +1,6 @@
 import { useState, Fragment } from "react";
 import { useRouter } from "next/router";
-//import factory from "../../lib/factory";
+import factory from "../../lib/factory";
 import web3 from "../../lib/web3";
 import Title from "../shared/Title";
 import Space from "../shared/Space";
@@ -31,18 +31,14 @@ export default function CreateView() {
   const [isDutchAuction, setIsDutchAuction] = useState(mechanism[0]);
 
   // token waiting list
-  const [tokenPrice, setTokenPrice] = useState("1000000000000000000");
-  const [tokenCap, setTokenCap] = useState("5");
-  const [timeToBuyInHours, setTimeToBuyInHours] = useState("24");
-  const [initialSupply, setInitialSupply] = useState("10");
+  const [tokenPrice, setTokenPrice] = useState("");
+  const [tokenCap, setTokenCap] = useState("");
+  const [timeToBuyInHours, setTimeToBuyInHours] = useState("");
+  const [initialSupply, setInitialSupply] = useState("");
 
   // white listing
   const [address, setAddress] = useState("");
-  const [addressList, setAddressList] = useState([
-    "0x32Da3311c8414773c876d36E3d61105dfbb9c9D8",
-    "0xDA0aaD724F7F0B78A8b31107d400b75c99F31070",
-    "0x11E04e773066874b311E854D713083EcEfD34897",
-  ]);
+  const [addressList, setAddressList] = useState([]);
   const [addressIsInList, setAddressIsInList] = useState(false);
 
   // handling
@@ -77,17 +73,6 @@ export default function CreateView() {
 
     setErrorMessage("");
     setIsDeploying(true);
-    console.log(
-      "Form Submit",
-      typeof title,
-      typeof description,
-      typeof tokenPrice,
-      typeof initialSupply,
-      typeof tokenCap,
-      typeof isDutchAuction.value,
-      typeof timeToBuyInHours,
-      typeof addressList
-    );
 
     try {
       const accounts = await web3.eth.getAccounts();
@@ -96,11 +81,11 @@ export default function CreateView() {
         .createCEF(
           title,
           description,
-          tokenPrice,
+          web3.utils.toWei(tokenPrice),
           initialSupply,
-          tokenCap,
+          isDutchAuction.value ? 0 : tokenCap,
           isDutchAuction.value,
-          timeToBuyInHours,
+          isDutchAuction.value ? 0 : timeToBuyInHours,
           addressList
         )
         .send({
@@ -310,7 +295,6 @@ export default function CreateView() {
                     name="price"
                     id="price"
                     className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-                    placeholder="1"
                     aria-describedby="price-currency"
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
