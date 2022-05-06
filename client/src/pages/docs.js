@@ -22,7 +22,7 @@ const variables = [
   {
     name: "tokenPrice",
     description:
-      "Price of the issued token; used as NAV for the waiting list mechanism and the price of the issued tokens in funds based on dutch auctions.",
+      "Price of the issued token; uses NAV for the waiting list mechanism and the result of auctions in funds based on dutch auctions.",
   },
   {
     name: "tokensPerInvestor",
@@ -41,7 +41,7 @@ const variables = [
   {
     name: "isDutchAuction",
     description:
-      "To determine if the fund is a dutch auction or a waiting list mechanism.",
+      "To determine if the fund uses a dutch auction or a waiting list mechanism.",
   },
   {
     name: "waitingList",
@@ -85,7 +85,7 @@ const corporateactions = [
   {
     name: "setTokenPrice",
     description:
-      "Only manager can set the token price; used as NAV for the waiting list mechanism and the price of the issued tokens in funds based on dutch auctions.",
+      "Only manager can set the token price; uses NAV for the waiting list mechanism and the result of auctions in funds based on dutch auctions.",
   },
   {
     name: "setTokenPerInvestor",
@@ -202,9 +202,9 @@ export default function Docs() {
                       Technical Documentation
                     </h1>
                     <p className="mt-1 text-gray-500">
-                      This is the technical documentation for the CSAM project
+                      This is the technical documentation of the CSAM project
                       at the Blockchain Challenge 2022 at the University of
-                      Basel. The GitHub repository can be found{" "}
+                      Basel. The GitHub repository can be found {" "}
                       <a
                         href="https://github.com/tuncpolat/cef-marketplace"
                         target="_blank"
@@ -220,7 +220,7 @@ export default function Docs() {
                     </h2>
                     <p className="mt-1 text-gray-500">
                       We decided to use a factory pattern to create our smart
-                      contracts, respectively, closed-end funds. The createCEF
+                      contracts for closed-end funds. The createCEF
                       function will create a closed-end fund contract and push
                       the contract instance into an array. We used this pattern
                       to simplify the front-end logic. Getting all the
