@@ -5,12 +5,21 @@ import Space from "../shared/Space";
 import QuestionMarkLabel from "../shared/QuestionMarkLabel";
 
 export default function WaitingInvestor() {
-  const [addressList, setAddressList] = useState([
-    "0x32Da3311c8414773c876d36E3d61105dfbb9c9D8",
-    "0xDA0aaD724F7F0B78A8b31107d400b75c99F31070",
-    "0x11E04e773066874b311E854D713083EcEfD34897",
-  ]);
+  const [whiteListedAddress, setWhiteListedAddress] = useState("");
+  const [startSearch, setStartSearch] = useState(false);
+  const [isWhitelisted, setIsWhitelisted] = useState(false);
 
+  const handleCheckWhiteListedAddress = () => {
+    setIsWhitelisted(false);
+    setStartSearch(true);
+    const found = fund.waitingList.find((e) => e === whiteListedAddress);
+    if (found) {
+      setIsWhitelisted(true);
+    } else {
+      setIsWhitelisted(false);
+    }
+    setWhiteListedAddress("");
+  };
   return (
     <div className="pt-10 sm:pt-16 lg:pt-8 pb-10 lg:pb-14 lg:overflow-hidden">
       <Space>
@@ -119,8 +128,8 @@ export default function WaitingInvestor() {
               <input
                 placeholder="Paste own address"
                 type="text"
-                name="first-name"
-                id="first-name"
+                value={whiteListedAddress}
+                onChange={(e) => setWhiteListedAddress(e.target.value)}
                 autoComplete="given-name"
                 className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
               />
@@ -130,12 +139,46 @@ export default function WaitingInvestor() {
             <div className="flex justify-end">
               <button
                 type="submit"
+                onClick={() => handleCheckWhiteListedAddress()}
                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Check Address
               </button>
             </div>
           </div>
+          {isWhitelisted ? (
+            <div className="rounded-md bg-green-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <CheckCircleIcon
+                    className="h-5 w-5 text-green-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">
+                    This address is white-listed
+                  </h3>
+                </div>
+              </div>
+            </div>
+          ) : startSearch ? (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <XCircleIcon
+                    className="h-5 w-5 text-red-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">
+                    This address is not white-listed
+                  </h3>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       </Space>
     </div>

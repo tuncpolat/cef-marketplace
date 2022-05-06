@@ -1,56 +1,21 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, Fragment } from "react";
 import WaitingInvestor from "../../components/view/WaitingInvestor";
 import WaitingManager from "../../components/view/WaitingManager";
-import { ExclamationIcon } from "@heroicons/react/solid";
 import { Dialog, Transition } from "@headlessui/react";
-import Cef from "../../lib/cef";
-import Link from "next/link";
+import { ExclamationIcon } from "@heroicons/react/solid";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function WaitingListPage({ address }) {
-  const [loading, setLoading] = useState(false);
-  const [fund, setFund] = useState(null);
+export default function WaitingListPage() {
   const [open, setOpen] = useState(false);
+  const [address, setAddress] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [tabs, setTabs] = useState([
     { name: "Manage Investment", current: 0 },
     { name: "Manage Fund", current: 1 },
   ]);
-
-  useEffect(() => {
-    const fetchFund = async () => {
-      if (address) {
-        setLoading(true);
-        const fund = Cef(address);
-        const data = await fund.methods.getSummary().call();
-        console.log(data);
-        setFund({
-          manager: data[0],
-          title: data[1],
-          description: data[2],
-          tokenPrice: data[3],
-          tokensPerInvestor: data[4],
-          timeToBuyInHours: data[5],
-          startDate: data[6],
-          isDutchAuction: data[7],
-          waitingList: data[8],
-          auctions: data[9],
-          sellings: data[10],
-        });
-      }
-
-      setLoading(false);
-    };
-
-    fetchFund();
-  }, [address]);
-
-  if (loading || fund === null) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 lg:px-8 pt-4">
@@ -64,18 +29,34 @@ export default function WaitingListPage({ address }) {
           </div>
           <div className="ml-3">
             <p className="text-sm text-blue-700">
-              The data is fetched from the smart contracts. Because you are
-              probably not white-listed take a look at a mockup{" "}
-              <Link href="/waitinglist/mockup">here</Link>
+              This is just a mockup of a fund with a waiting mechanism and not
+              connected with the smart contract.{" "}
+              <a
+                target="_blank"
+                href="https://metamask.io/download/"
+                className="font-medium underline text-blue-700 hover:text-blue-600"
+              >
+                Download Metamask wallet here to interact.
+              </a>
             </p>
           </div>
         </div>
       </div>
       <div className="max-w-xl mt-8">
         <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-          {fund.title}
+          CS Multi-Manager Real Estate Global
         </h2>
-        <p className="mt-5 text-xl text-gray-500">{fund.description}</p>
+        <p className="mt-5 text-xl text-gray-500">
+          CS (Lux) Multi-Manager Real Estate Global invests in a globally
+          diversified portfolio of non-listed real estate funds using an active
+          selection process. The investment group pursues a core+ investment
+          strategy with a majority of investments in funds pursuing a core
+          investment strategy thereby generating longterm, stable cash flow from
+          rental income. To a lesser extent the investment group invests in
+          value-add and opportunistic real estate funds which strive to achieve
+          attractive risk-adjusted returns.{" "}
+          <span className="font-bold">5% of the shares are tokenized.</span>
+        </p>
       </div>
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
@@ -193,6 +174,8 @@ export default function WaitingListPage({ address }) {
                         id="address"
                         className="mt-5 sm:mt-6 cursor-not-allowed focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
                         placeholder="0x..."
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                       />
                     ) : (
                       <button
@@ -221,10 +204,4 @@ export default function WaitingListPage({ address }) {
       </Transition.Root>
     </div>
   );
-}
-
-export async function getServerSideProps({ query }) {
-  return {
-    props: { address: query.address }, // will be passed to the page component as props
-  };
 }

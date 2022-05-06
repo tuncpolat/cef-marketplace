@@ -1,35 +1,10 @@
-import { useState } from "react";
-import AuctionsCards from "../shared/Auction";
-import {
-  CalendarIcon,
-  InformationCircleIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-} from "@heroicons/react/solid";
+import FakeAuctionsCards from "../shared/FakeAuction";
+import { CalendarIcon } from "@heroicons/react/solid";
 import Title from "../shared/Title";
 import Space from "../shared/Space";
 import QuestionMarkLabel from "../shared/QuestionMarkLabel";
-import web3 from "../../lib/web3";
-import Cef from "../../lib/cef";
 
-export default function AuctionInvestor({ address, fund, auctions }) {
-  const [amountToBuy, setAmountToBuy] = useState(0);
-  const [whiteListedAddress, setWhiteListedAddress] = useState("");
-  const [startSearch, setStartSearch] = useState(false);
-  const [isWhitelisted, setIsWhitelisted] = useState(false);
-
-  const handleCheckWhiteListedAddress = () => {
-    setIsWhitelisted(false);
-    setStartSearch(true);
-    const found = fund.waitingList.find((e) => e === whiteListedAddress);
-    if (found) {
-      setIsWhitelisted(true);
-    } else {
-      setIsWhitelisted(false);
-    }
-    setWhiteListedAddress("");
-  };
-
+export default function FakeAuctionInvestor() {
   return (
     <div className="pt-10 sm:pt-16 lg:pt-8 pb-10 lg:pb-14 lg:overflow-hidden">
       <Space>
@@ -39,25 +14,7 @@ export default function AuctionInvestor({ address, fund, auctions }) {
             "Currently available tokens - Please place your bid to buy your tokens from other qualified investors."
           }
         />
-        {auctions.length === 0 ? (
-          <div className="rounded-md bg-blue-50 p-4 mt-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <InformationCircleIcon
-                  className="h-5 w-5 text-blue-400"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="ml-3 flex-1 md:flex md:justify-between">
-                <p className="text-sm text-blue-700">
-                  No auctions available right now.
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <AuctionsCards auctions={auctions} />
-        )}
+        <FakeAuctionsCards />
       </Space>
 
       <Space>
@@ -78,8 +35,8 @@ export default function AuctionInvestor({ address, fund, auctions }) {
             <input
               placeholder="Amount of Tokens"
               type="number"
-              value={amountToBuy}
-              onChange={(e) => setAmountToBuy(e.target.value)}
+              name="first-name"
+              id="first-name"
               autoComplete="given-name"
               className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
             />
@@ -88,7 +45,7 @@ export default function AuctionInvestor({ address, fund, auctions }) {
                 Total Price
               </dt>
               <dd className="mt-1 text-md font-semibold text-gray-900">
-                {amountToBuy * web3.utils.fromWei(fund.tokenPrice)} ETH
+                2 ETH
               </dd>
             </div>
           </div>
@@ -97,7 +54,6 @@ export default function AuctionInvestor({ address, fund, auctions }) {
           <div className="flex justify-end">
             <button
               type="submit"
-              onClick={() => handleBuyTokensFromManager()}
               className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Buy Tokens
@@ -124,6 +80,8 @@ export default function AuctionInvestor({ address, fund, auctions }) {
             <div className="flex mt-4 sm:mt-0 sm:col-span-2">
               <input
                 type="text"
+                name="first-name"
+                id="first-name"
                 autoComplete="given-name"
                 className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
               />
@@ -224,8 +182,8 @@ export default function AuctionInvestor({ address, fund, auctions }) {
               <input
                 placeholder="Paste own address"
                 type="text"
-                value={whiteListedAddress}
-                onChange={(e) => setWhiteListedAddress(e.target.value)}
+                name="first-name"
+                id="first-name"
                 autoComplete="given-name"
                 className="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
               />
@@ -235,46 +193,12 @@ export default function AuctionInvestor({ address, fund, auctions }) {
             <div className="flex justify-end">
               <button
                 type="submit"
-                onClick={() => handleCheckWhiteListedAddress()}
                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Check Address
               </button>
             </div>
           </div>
-          {isWhitelisted ? (
-            <div className="rounded-md bg-green-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <CheckCircleIcon
-                    className="h-5 w-5 text-green-400"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">
-                    This address is white-listed
-                  </h3>
-                </div>
-              </div>
-            </div>
-          ) : startSearch ? (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <XCircleIcon
-                    className="h-5 w-5 text-red-400"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    This address is not white-listed
-                  </h3>
-                </div>
-              </div>
-            </div>
-          ) : null}
         </div>
       </Space>
     </div>

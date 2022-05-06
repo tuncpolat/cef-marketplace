@@ -1,4 +1,35 @@
 import Link from "next/link";
+import { ExclamationIcon } from "@heroicons/react/solid";
+
+const fakeFunds = [
+  {
+    id: 1,
+    title: "CS Multi-Manager Real Estate Global",
+    href: "/auction/mockup",
+    mechanism: { name: "Dutch Auction", href: "/auction/mockup" },
+    description:
+      "CS (Lux) Multi-Manager Real Estate Global invests in a globally diversified portfolio of non-listed real estate funds using an active selection process. The investment group pursues a core+ investment strategy with a majority of investments in funds pursuing a core investment strategy thereby generating longterm, stable cash flow from rental income. To a lesser extent the investment group invests in value-add and opportunistic real estate funds which strive to achieve attractive risk-adjusted returns.",
+    manager: "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db",
+  },
+  {
+    id: 2,
+    title: "Multi-Manager Real Estate SBPH-I",
+    href: "/waitinglist/mockup",
+    mechanism: { name: "Waiting List", href: "/waitinglist/mockup" },
+    description:
+      "CS (Lux) Multi-Manager Real Estate SBPH-I CHF invests in a globally diversified portfolio of non-listed real estate funds using an active selection process. The investment group pursues a core+ investment strategy with a majority of investments in funds pursuing a core investment strategy thereby generating longterm, stable cash flow from rental income. To a lesser extent the investment group invests in value-add and opportunistic real estate funds which strive to achieve attractive risk-adjusted returns.",
+    manager: "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
+  },
+  {
+    id: 3,
+    title: "Multi-Manager Real Estate",
+    href: "/waitinglist/mockup",
+    mechanism: { name: "Waiting List", href: "/waitinglist/mockup" },
+    description:
+      "CS (Lux) Multi-Manager Real Estate EBPH CHF invests in a globally diversified portfolio of non-listed real estate funds using an active selection process. The investment group pursues a core+ investment strategy with a majority of investments in funds pursuing a core investment strategy thereby generating longterm, stable cash flow from rental income. To a lesser extent the investment group invests in value-add and opportunistic real estate funds which strive to achieve attractive risk-adjusted returns.",
+    manager: "0xc3FA394F0B8EE501f97A56B3D7f7190aB66e81a7",
+  },
+];
 
 const people = [
   {
@@ -22,7 +53,7 @@ const people = [
   },
 ];
 
-export default function HomeView({ funds, loading }) {
+export default function HomeView({ error, funds, loading }) {
   return (
     <>
       <div className="pt-10 bg-gray-900 sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
@@ -86,7 +117,9 @@ export default function HomeView({ funds, loading }) {
           </div>
           <div
             className={`mt-12 mx-auto max-w-md px-4 sm:max-w-lg sm:px-6 lg:px-8 lg:max-w-7xl ${
-              loading ? "flex  justify-center" : "grid gap-8 lg:grid-cols-3"
+              loading || error
+                ? "flex flex-col justify-center"
+                : "grid gap-8 lg:grid-cols-3"
             }`}
           >
             {loading ? (
@@ -107,7 +140,80 @@ export default function HomeView({ funds, loading }) {
                 ></path>
               </svg>
             ) : funds.length === 0 ? (
-              "No funds deployed yet"
+              error ? (
+                <>
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <ExclamationIcon
+                          className="h-5 w-5 text-yellow-400"
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-700">
+                          Download a wallet to explore funds and interact with
+                          the marketplace on the Ropsten testnet!{" "}
+                          <a
+                            target="_blank"
+                            href="https://metamask.io/download/"
+                            className="font-medium underline text-yellow-700 hover:text-yellow-600"
+                          >
+                            Download metamask wallet here
+                          </a>
+                          . Nevertheless, we listed some mockup funds for
+                          illustrative purposes below.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-12 mx-auto max-w-md px-4 grid gap-8 sm:max-w-lg sm:px-6 lg:px-8 lg:grid-cols-3 lg:max-w-7xl">
+                    {fakeFunds.map((fakeFund) => (
+                      <Link key={fakeFund.id} href={fakeFund.mechanism.href}>
+                        <div className="flex flex-col rounded-lg shadow-lg overflow-hidden cursor-pointer">
+                          <div className="flex-1 bg-white p-6 flex flex-col justify-between">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-primary">
+                                <a
+                                  href={fakeFund.mechanism.href}
+                                  className="hover:underline"
+                                >
+                                  {fakeFund.mechanism.name}
+                                </a>
+                              </p>
+                              <a href={fakeFund.href} className="block mt-2">
+                                <p className="text-xl font-semibold text-gray-900">
+                                  {fakeFund.title}
+                                </p>
+                                <p className="mt-3 text-base text-gray-500">
+                                  {fakeFund.description}
+                                </p>
+                              </a>
+                            </div>
+                            <div className="mt-6 flex items-center">
+                              <div className="">
+                                <p className="text-sm font-medium text-gray-900">
+                                  <a
+                                    href={fakeFund.mechanism.href}
+                                    className="hover:underline"
+                                  >
+                                    Manager
+                                  </a>
+                                </p>
+                                <div className="flex space-x-1 text-sm text-gray-500">
+                                  <span>{fakeFund.manager}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                "No funds deployed yet"
+              )
             ) : (
               funds.map((fund) => (
                 <Link

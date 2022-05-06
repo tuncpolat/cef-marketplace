@@ -1,7 +1,31 @@
-const AuctionsCards = ({ auctions }) => {
+const posts = [
+  {
+    seller: "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
+    startinPrice: "1 ETH",
+    discount: "0.01 ETH",
+    expiresAt: "2022-04-23 12:00:00",
+    amountToSell: "2 Tokens",
+  },
+  {
+    seller: "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
+    startinPrice: "2 ETH",
+    discount: "0.05 ETH",
+    expiresAt: "2022-04-25 12:00:00",
+    amountToSell: "5 Tokens",
+  },
+  {
+    seller: "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
+    startinPrice: "3 ETH",
+    discount: "0.001 ETH",
+    expiresAt: "2022-04-24 12:00:00",
+    amountToSell: "8 Tokens",
+  },
+];
+
+const FakeAuctionsCards = ({ auctions }) => {
   return (
     <div className="mt-6 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-      {auctions.map((auction, idx) => (
+      {posts.map((post, idx) => (
         <div
           key={idx}
           className="flex flex-col rounded-lg shadow-lg overflow-hidden"
@@ -19,7 +43,7 @@ const AuctionsCards = ({ auctions }) => {
                     </span>
                   </div>
                   <p className="mt-1 text-gray-500 text-sm truncate">
-                    {auction.seller}
+                    {post.seller}
                   </p>
                 </div>
               </div>
@@ -32,7 +56,7 @@ const AuctionsCards = ({ auctions }) => {
                   </h3>
                 </div>
                 <p className="mt-1 text-gray-500 text-sm truncate">
-                  {auction.startinPrice}
+                  {post.startinPrice}
                 </p>
               </div>
             </div>
@@ -44,7 +68,7 @@ const AuctionsCards = ({ auctions }) => {
                   </h3>
                 </div>
                 <p className="mt-1 text-gray-500 text-sm truncate">
-                  {auction.discount}
+                  {post.discount}
                 </p>
               </div>
             </div>
@@ -56,7 +80,7 @@ const AuctionsCards = ({ auctions }) => {
                   </h3>
                 </div>
                 <p className="mt-1 text-gray-500 text-sm truncate">
-                  {auction.expiresAt}
+                  {post.expiresAt}
                 </p>
               </div>
             </div>
@@ -68,7 +92,7 @@ const AuctionsCards = ({ auctions }) => {
                   </h3>
                 </div>
                 <p className="mt-1 text-gray-500 text-sm truncate">
-                  {auction.amountToSell}
+                  {post.amountToSell}
                 </p>
               </div>
             </div>
@@ -102,4 +126,4 @@ const AuctionsCards = ({ auctions }) => {
   );
 };
 
-export default AuctionsCards;
+export default FakeAuctionsCards;

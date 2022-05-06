@@ -1105,9 +1105,19 @@ export default function Docs() {
                       </h2>
                       <p className="mt-1 text-gray-500">
                         The front-end is the web application that allows the
-                        investor and the manager to interact with the contracts.
-                        The framework we used is Nextjs. Additionally, we
-                        injected Web3 library to connect with the blockchain.
+                        investor and the manager to interact with the contracts
+                        in user friendly way. The framework we used is Nextjs.
+                        Additionally, we injected Web3 library to connect with
+                        the blockchain. Fetching the smart contracts and
+                        deploying them works. When it comes to the management of
+                        the funds, we decided not to implement the
+                        functionalities, as the visitors at the Gala Event will
+                        not be able to trade the tokens. Instead, we implemented
+                        the funds pre-filled pages for a fund with a dutch
+                        auction and a fund based on a waiting list mechanism.
+                        These funds appear in the exploration section, as soon
+                        as the front-end sees that no Metamask connection is
+                        established.
                       </p>
                     </div>
                   </div>
